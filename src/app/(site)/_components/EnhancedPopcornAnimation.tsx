@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 const EnhancedPopcornAnimation = () => {
   // Tạo array các items với các icon khác nhau
-  const items = [
+  const items: { icon: string; weight: number }[] = [
     { icon: '🍿', weight: 0.4 }, // Popcorn - nhiều nhất
     { icon: '🎬', weight: 0.2 }, // Film reel
     { icon: '⭐', weight: 0.2 }, // Star
@@ -13,7 +13,7 @@ const EnhancedPopcornAnimation = () => {
     { icon: '🎪', weight: 0.1 }, // Circus tent
   ];
   // Seeded RNG to keep SSR and CSR deterministic
-  const createRng = (seed) => {
+  const createRng = (seed: number): (() => number) => {
     let t = seed >>> 0;
     return () => {
       t += 0x6D2B79F5;
@@ -24,8 +24,8 @@ const EnhancedPopcornAnimation = () => {
   };
 
   // Tạo array các items với tỷ lệ theo weight (memoized)
-  const allItems = useMemo(() => {
-    const arr = [];
+  const allItems = useMemo<string[]>(() => {
+    const arr: string[] = [];
     const baseCount = 20; // fixed for deterministic SSR/CSR
     items.forEach(item => {
       const count = Math.floor(item.weight * baseCount);
@@ -35,10 +35,21 @@ const EnhancedPopcornAnimation = () => {
   }, []);
 
   // Tạo array các popcorn với vị trí và thời gian rơi khác nhau (memoized)
-  const popcornItems = useMemo(() => {
+  type PopcornItem = {
+    id: number;
+    delay: number;
+    duration: number;
+    x: number;
+    size: number;
+    rotation: number;
+    icon: string;
+    opacity: number;
+  };
+
+  const popcornItems = useMemo<PopcornItem[]>(() => {
     const len = 24; // fixed for deterministic SSR/CSR
     const rng = createRng(123456789);
-    return Array.from({ length: len }, (_, i) => {
+    return Array.from({ length: len }, (_, i): PopcornItem => {
       const delay = rng() * 8;
       const duration = 4 + rng() * 6;
       const x = rng() * 100;
