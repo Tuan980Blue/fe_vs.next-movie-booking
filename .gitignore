@@ -1,45 +1,128 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
+####################################
+# 🧩 DEPENDENCIES & PACKAGE MANAGERS
+####################################
+node_modules/
+.pnp/
+.pnp.*            # Yarn Plug’n’Play files
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+!.yarn/sdks
+!.yarn/rc.yml
 
-# testing
-/coverage
+####################################
+# 🧪 TESTING & COVERAGE
+####################################
+coverage/
+.nyc_output/
+jest-cache/
+jest-html-reporters-*
 
-# next.js
-/.next/
-/out/
+####################################
+# ⚡ NEXT.JS BUILD OUTPUT
+####################################
+.next/
+out/
+.next/cache/
+.next/static/
+build/
+dist/
 
-# production
-/build
+####################################
+# 🚀 DEPLOYMENT / HOSTING
+####################################
+.vercel/          # Vercel project settings
+.netlify/         # Netlify builds (if used)
+firebase-debug.log
+firebase.json
 
-# misc
-.DS_Store
-*.pem
+####################################
+# 🧰 ENVIRONMENT CONFIG FILES
+####################################
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.bak
+.env*.backup
 
-# debug
+####################################
+# 🪵 LOGS & DEBUG FILES
+####################################
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+####################################
+# 💻 EDITOR & IDE FILES
+####################################
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
 
-# vercel
-.vercel
+####################################
+# 🧱 OS-SPECIFIC & SYSTEM FILES
+####################################
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+ehthumbs.db
+Icon?
+.Trashes
 
-# typescript
+####################################
+# 🐳 DOCKER
+####################################
+docker-compose.override.yml
+.docker/
+Dockerfile.dev
+Dockerfile.local
+*.pid
+
+####################################
+# 🧩 TYPESCRIPT
+####################################
 *.tsbuildinfo
 next-env.d.ts
+
+####################################
+# 🧱 LINT & CACHE FILES
+####################################
+.eslintcache
+.stylelintcache
+.cache/
+.tmp/
+.tmp*/
+.parcel-cache/
+.cache-loader/
+.babel-cache/
+.fusebox/
+
+####################################
+# 🔧 MISC
+####################################
+*.pem
+*.key
+*.crt
+*.log
+*.lock
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
