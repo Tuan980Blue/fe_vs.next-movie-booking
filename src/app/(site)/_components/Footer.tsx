@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { FaFacebook, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
 import Link from "next/link";
-import EnhancedPopcornAnimation from "@/components/EnhancedPopcornAnimation";
+import EnhancedPopcornAnimation from "@/app/(site)/_components/EnhancedPopcornAnimation";
 
 const Footer = () => {
   // Lấy năm hiện tại cho copyright

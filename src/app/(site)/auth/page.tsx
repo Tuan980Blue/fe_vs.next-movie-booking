@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {COLORS} from "@/lib/theme/colors";
 import {useState} from "react";
-import EnhancedPopcornAnimation from "@/components/EnhancedPopcornAnimation";
+import EnhancedPopcornAnimation from "@/app/(site)/_components/EnhancedPopcornAnimation";
 import LoginForm from "@/app/(site)/auth/_components/LoginForm";
 import RegisterForm from "@/app/(site)/auth/_components/RegisterForm";
 
