@@ -1,10 +1,9 @@
-import React from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaYoutube, FaTiktok } from 'react-icons/fa';
-import { COLORS } from '../../shared/constants/colors';
-import backgroundFooter from '../../assets/images/background-footer.png';
-import PopcornAnimation from "../../components/animations/EnhancedPopcornAnimation";
+import Link from "next/link";
+import EnhancedPopcornAnimation from "@/components/EnhancedPopcornAnimation";
 
 const Footer = () => {
   // Lấy năm hiện tại cho copyright
@@ -14,14 +13,14 @@ const Footer = () => {
     <footer
       className="relative overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(rgba(45, 27, 105, 0.8), rgba(13, 37, 63, 0.8)), url(${backgroundFooter})`,
+        backgroundImage: "linear-gradient(rgba(45, 27, 105, 0.8), rgba(13, 37, 63, 0.8)), url(/background-footer.png)",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
       {/* Popcorn Falling Animation */}
-      <PopcornAnimation />
+      <EnhancedPopcornAnimation />
 
       {/* Background Pattern - Tạo hiệu ứng cinema */}
       <div className="absolute inset-0 opacity-5">
@@ -96,7 +95,7 @@ const Footer = () => {
                 ].map((link, index) => (
                   <li key={index}>
                     <Link
-                      to={link.path}
+                      href={link.path}
                       className="text-neutral-white opacity-75 hover:opacity-100 hover:text-accent-yellow transition-all duration-300 text-sm flex items-center group"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -157,7 +156,7 @@ const Footer = () => {
                     ].map((link, index) => (
                       <li key={index}>
                         <Link
-                          to={link.path}
+                          href={link.path}
                           className="text-neutral-white opacity-75 hover:opacity-100 hover:text-accent-yellow transition-all duration-300 text-sm flex items-center group"
                         >
                           <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -222,9 +221,6 @@ const Footer = () => {
                        whileHover={{ scale: 1.05 }}
                        whileTap={{ scale: 0.95 }}
                        className="flex items-center justify-center p-3 rounded-lg bg-neutral-white bg-opacity-10 hover:bg-opacity-20 transition-all duration-300 group"
-                       style={{
-                         '--hover-color': social.color
-                       }}
                      >
                        <IconComponent
                          size={24}
@@ -269,8 +265,7 @@ const Footer = () => {
 
       {/* Bottom Bar - Copyright */}
       <div
-        className="relative z-10 border-t border-neutral-white border-opacity-20"
-        style={{ backgroundColor: COLORS.PRIMARY.BLACK }}
+        className="relative z-10 border-t border-neutral-white border-opacity-20 bg-black"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
