@@ -1,18 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import {COLORS} from "../../shared/constants/colors";
+import Link from "next/link";
+import {useEffect, useRef, useState} from "react";
 
 const Navbar = () => {
+  // Temporary stub until auth hook is implemented
+  const isAuthenticated = false;
+  const user = null;
+  const logout = () => {};
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [isMainNavFixed, setIsMainNavFixed] = useState(false);
   const [mainNavHeight, setMainNavHeight] = useState(0);
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
-  const headerRef = useRef(null);
-  const mainNavRef = useRef(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const mainNavRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const measureHeights = () => {
@@ -51,7 +53,6 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
   };
 
   return (
@@ -70,7 +71,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Left Side - Logo */}
           <div className="flex items-center space-x-4">
-            <Link to="/">
+            <Link href="/">
               <motion.div
                 className="flex items-center space-x-3"
                 whileHover={{ scale: 1.05 }}
@@ -135,12 +136,12 @@ const Navbar = () => {
                 {/* User Profile */}
                 <div className="hidden sm:flex items-center space-x-2 text-neutral-white">
                   <span className="text-lg">👤</span>
-                  <span className="font-semibold text-sm">{user?.name}</span>
+                  <span className="font-semibold text-sm">Tên nè</span>
                 </div>
 
                 {/* User Menu */}
                 <div className="hidden sm:flex items-center space-x-2">
-                  <Link to="/user/profile">
+                  <Link href="/user/profile">
                     <motion.button
                       className="px-3 py-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
                       whileHover={{ scale: 1.05 }}
@@ -149,7 +150,7 @@ const Navbar = () => {
                       Profile
                     </motion.button>
                   </Link>
-                  <Link to="/user/my-bookings">
+                  <Link href="/user/my-bookings">
                     <motion.button
                       className="px-3 py-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
                       whileHover={{ scale: 1.05 }}
@@ -174,9 +175,9 @@ const Navbar = () => {
             ) : (
               <>
                 {/* Register Button */}
-                <Link to="/auth">
+                <Link href="/auth">
                   <motion.button
-                    className="hidden sm:flex items-center space-x-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white px-4 py-2 rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all"
+                    className="hidden sm:flex items-center space-x-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white px-4 py-2 rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all cursor-pointer"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -186,7 +187,7 @@ const Navbar = () => {
                 </Link>
 
                 {/* Login Button */}
-                <Link to="/auth">
+                <Link href="/auth">
                   <motion.button
                     className="flex items-center space-x-2 bg-primary-pink px-4 py-2 rounded-full text-neutral-white hover:bg-cinema-neonPink transition-all shadow-lg"
                     whileHover={{ scale: 1.05 }}
@@ -236,7 +237,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {menuItems.map((item) => (
-              <Link key={item.id} to={item.path}>
+              <Link key={item.id} href={item.path}>
                 <motion.button
                   onClick={() => setActiveTab(item.id)}
                   className={`relative px-4 py-2 rounded-t-lg font-semibold text-sm transition-all ${
@@ -276,7 +277,7 @@ const Navbar = () => {
           >
             <div className="py-4 space-y-2">
               {menuItems.map((item) => (
-                <Link key={item.id} to={item.path}>
+                <Link key={item.id} href={item.path}>
                   <motion.button
                     onClick={() => {
                       setActiveTab(item.id);

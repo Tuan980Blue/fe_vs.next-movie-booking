@@ -10,6 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Custom color tokens used across components */
+  --color-primary-pink: #ec4899;
+  --color-primary-purple: #8b5cf6;
+  --color-accent-yellow: #fbbf24;
+  --color-accent-orange: #f97316;
+  --color-accent-red: #ef4444;
+  --color-neutral-white: #ffffff;
+  --color-neutral-darkGray: #1f2937;
+  --color-neutral-lightGray: #9ca3af;
+  --color-cinema-neonBlue: #00e5ff;
+  --color-cinema-neonPink: #ff6ec7;
 }
 
 @media (prefers-color-scheme: dark) {
