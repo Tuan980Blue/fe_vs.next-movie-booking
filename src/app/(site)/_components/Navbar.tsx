@@ -71,7 +71,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Left Side - Logo */}
           <div className="flex items-center space-x-4">
-            <Link href="/">
+            <Link href="/public">
               <motion.div
                 className="flex items-center space-x-3"
                 whileHover={{ scale: 1.05 }}
