@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { motion, AnimatePresence } from 'framer-motion';
 import {COLORS} from "@/lib/theme/colors";
@@ -6,19 +6,22 @@ import {useState} from "react";
 import EnhancedPopcornAnimation from "@/app/(site)/_components/EnhancedPopcornAnimation";
 import LoginForm from "@/app/(site)/auth/_components/LoginForm";
 import RegisterForm from "@/app/(site)/auth/_components/RegisterForm";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const AuthPage = () => {
     const [currentView, setCurrentView] = useState('login'); // 'login', 'register'
-    // Temporary stub handlers until useAuth is implemented
+    const { login, register, isAuthenticated } = useAuth();
+    const router = useRouter();
 
     const handleLogin = async (userData: { email: string; password: string; rememberMe?: boolean }) => {
-        console.log('Login stub called with:', userData);
-        alert('Đăng nhập (stub) thành công!');
+        await login({ email: userData.email, password: userData.password, rememberMe: userData.rememberMe });
+        router.push('/');
     };
 
     const handleRegister = async (userData: { fullName: string; email: string; password: string }) => {
-        console.log('Register stub called with:', userData);
-        alert('Đăng ký (stub) thành công!');
+        await register({ fullName: userData.fullName, email: userData.email, password: userData.password });
+        setCurrentView('login');
     };
 
     const switchToRegister = () => {

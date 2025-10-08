@@ -3,12 +3,10 @@
 import { motion } from 'framer-motion';
 import Link from "next/link";
 import {useEffect, useRef, useState} from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
-  // Temporary stub until auth hook is implemented
-  const isAuthenticated = false;
-  const user = null;
-  const logout = () => {};
+  const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [isMainNavFixed, setIsMainNavFixed] = useState(false);
@@ -136,7 +134,7 @@ const Navbar = () => {
                 {/* User Profile */}
                 <div className="hidden sm:flex items-center space-x-2 text-neutral-white">
                   <span className="text-lg">👤</span>
-                  <span className="font-semibold text-sm">Tên nè</span>
+                  <span className="font-semibold text-sm">{user?.fullName}</span>
                 </div>
 
                 {/* User Menu */}
