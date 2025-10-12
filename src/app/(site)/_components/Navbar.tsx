@@ -134,7 +134,9 @@ const Navbar = () => {
                 {/* User Profile */}
                 <div className="hidden sm:flex items-center space-x-2 text-neutral-white">
                   <span className="text-lg">👤</span>
-                  <span className="font-semibold text-sm">{user?.fullName}</span>
+                  <span className="font-semibold text-sm">
+                    {user?.fullName || user?.email?.split('@')[0] || 'User'}
+                  </span>
                 </div>
 
                 {/* User Menu */}
