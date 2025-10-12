@@ -35,12 +35,32 @@ export async function logoutApi() {
 export function parseUserFromAccessToken(accessToken: string): User | null {
   const payload = decodeJwtPayload(accessToken);
   if (!payload) return null;
-  // Mapping một số claim phổ biến từ token mẫu bạn cung cấp
+  
+  // Extract roles from various possible claim formats
+  let roles: string[] = [];
+  const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string ||
+                   payload.role as string ||
+                   payload.roles as string[];
+  
+  if (Array.isArray(roleClaim)) {
+    roles = roleClaim;
+  } else if (typeof roleClaim === 'string') {
+    roles = [roleClaim];
+  } else {
+    roles = ['user']; // Default role
+  }
+  
+  // Extract full name from various possible claim formats
+  const fullName = (payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] as string) ||
+                  (payload.name as string) ||
+                  (payload.fullName as string) ||
+                  '';
+  
   const user: User = {
     id: payload.sub as string,
     email: payload.email as string,
-    fullName: (payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] as string) || (payload.name as string) || '',
-    roles: [(payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string) || (payload.role as string) || 'user'],
+    fullName,
+    roles: roles.map(r => r.toLowerCase()),
     status: 1, // Default to Active
     createdAt: new Date().toISOString(),
   };
@@ -55,7 +75,12 @@ export async function getMeApi() {
 
 export function mapMeResponseToUser(me: UserResponse | null): User | null {
   if (!me) return null;
-  const roles = Array.isArray(me.roles) ? me.roles.map((r) => (r.name || '').toString().toLowerCase()) : [];
+  
+  // Extract role names from roles array
+  const roles = Array.isArray(me.roles) 
+    ? me.roles.map((r) => (r.name || '').toString().toLowerCase()).filter(Boolean)
+    : [];
+  
   return {
     id: me.id,
     email: me.email,

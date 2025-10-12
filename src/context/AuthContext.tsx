@@ -1,148 +1,222 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { loginApi, registerApi, getMeApi, mapMeResponseToUser, parseUserFromAccessToken } from "@/service/services/authService";
-import type { LoginRequest, RegisterRequest, User } from "@/models/user";
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
+import {
+    loginApi,
+    registerApi,
+    getMeApi,
+    logoutApi,
+    parseUserFromAccessToken,
+    mapMeResponseToUser
+} from "@/service/services/authService";
+import type {LoginRequest, RegisterRequest, User} from "@/models/user";
+import {
+    setAccessTokenCookie,
+    getAccessTokenFromCookie,
+    setRoleCookie,
+    clearAllAuthCookies
+} from "@/lib/auth/cookies";
+import {isAdminFromToken} from "@/lib/auth/jwt";
 
 type AuthContextValue = {
-  user: User | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (payload: LoginRequest & { rememberMe?: boolean }) => Promise<void>;
-  register: (payload: RegisterRequest) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshFromStorage: () => void;
+    user: User | null;
+    accessToken: string | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (payload: LoginRequest & { rememberMe?: boolean }) => Promise<void>;
+    register: (payload: RegisterRequest) => Promise<void>;
+    logout: () => Promise<void>;
+    refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const ACCESS_TOKEN_KEY = "access_token";
-const ACCESS_TOKEN_EXPIRES_AT_KEY = "access_token_expires_at";
-const USER_DATA_KEY = "user_data";
+// Storage keys
+const USER_KEY = 'user';
 
-function readStoredToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.sessionStorage.getItem(ACCESS_TOKEN_KEY) || window.localStorage.getItem(ACCESS_TOKEN_KEY);
-}
-
-function saveToken(token: string, remember?: boolean, expiresAt?: string) {
-  if (typeof window === "undefined") return;
-  const storage = remember ? window.localStorage : window.sessionStorage;
-  storage.setItem(ACCESS_TOKEN_KEY, token);
-  if (expiresAt) storage.setItem(ACCESS_TOKEN_EXPIRES_AT_KEY, expiresAt);
-}
-
-function clearStoredAuth() {
-  if (typeof window === "undefined") return;
-  window.sessionStorage.removeItem(ACCESS_TOKEN_KEY);
-  window.sessionStorage.removeItem(ACCESS_TOKEN_EXPIRES_AT_KEY);
-  window.localStorage.removeItem(ACCESS_TOKEN_KEY);
-  window.localStorage.removeItem(ACCESS_TOKEN_EXPIRES_AT_KEY);
-  window.localStorage.removeItem(USER_DATA_KEY);
-}
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const refreshFromStorage = useCallback(() => {
-    const token = readStoredToken();
-    setAccessToken(token);
-    if (token) {
-      // Prefer parsing from token first for snappy UI, then reconcile with /users/me
-      const parsed = parseUserFromAccessToken(token);
-      if (parsed) {
-        setUser(parsed);
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(USER_DATA_KEY, JSON.stringify(parsed));
-        }
-      }
+// Helper functions
+const setStoredUser = (user: User | null): void => {
+    if (typeof window === 'undefined') return;
+    if (user) {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } else {
+        localStorage.removeItem(USER_KEY);
     }
-  }, []);
+};
 
-  useEffect(() => {
-    // Hydrate on mount
-    refreshFromStorage();
-    (async () => {
-      try {
-        const me = await getMeApi().catch(() => null);
-        const mapped = mapMeResponseToUser(me);
-        if (mapped) setUser(mapped);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [refreshFromStorage]);
-
-  const login = useCallback(async (payload: LoginRequest & { rememberMe?: boolean }) => {
-    const data = await loginApi({ email: payload.email, password: payload.password });
-    const newToken: string | undefined = data?.accessToken;
-    const accessTokenExpiresAt: string | undefined = data?.accessTokenExpiresAt;
-    if (!newToken) throw new Error("Login failed: missing access token");
-    saveToken(newToken, payload.rememberMe, accessTokenExpiresAt);
-    setAccessToken(newToken);
-    const parsed = parseUserFromAccessToken(newToken);
-    if (parsed) setUser(parsed);
-    // Optionally reconcile with /me in background
-    getMeApi().then(mapMeResponseToUser).then((u) => u && setUser(u)).catch(() => {});
-    // Set a readable cookie flag for middleware to check
-    if (typeof document !== "undefined") {
-      const maxAge = payload.rememberMe ? 60 * 60 * 24 * 7 : 60 * 60 * 2; // 7 days or 2 hours
-      document.cookie = `auth=1; Max-Age=${maxAge}; Path=/`;
-      const role = (parsed?.roles?.[0] || "").toLowerCase();
-      if (role) document.cookie = `role=${encodeURIComponent(role)}; Max-Age=${maxAge}; Path=/`;
-    }
-  }, []);
-
-  const register = useCallback(async (payload: RegisterRequest) => {
-    await registerApi(payload);
-  }, []);
-
-  const logout = useCallback(async () => {
+const getStoredUser = (): User | null => {
+    if (typeof window === 'undefined') return null;
     try {
-      // Best-effort call; server should clear refresh cookie
-      const { default: httpClient } = await import("@/service/api/httpClient");
-      const { default: endpoints } = await import("@/service/api/endpoints");
-      await httpClient.post(endpoints.auth.logout, {});
-    } catch (_) {
-      // ignore
-    } finally {
-      clearStoredAuth();
-      setUser(null);
-      setAccessToken(null);
-      // Clear the readable cookie flag
-      if (typeof document !== "undefined") {
-        document.cookie = "auth=; Max-Age=0; Path=/";
-        document.cookie = "role=; Max-Age=0; Path=/";
-      }
-      router.push("/");
+        const stored = localStorage.getItem(USER_KEY);
+        return stored ? JSON.parse(stored) : null;
+    } catch {
+        return null;
     }
-  }, [router]);
+};
 
-  const value = useMemo<AuthContextValue>(() => ({
-    user,
-    accessToken,
-    isAuthenticated: !!user && !!accessToken,
-    isLoading,
-    login,
-    register,
-    logout,
-    refreshFromStorage,
-  }), [user, accessToken, isLoading, login, register, logout, refreshFromStorage]);
+const clearAuthData = (): void => {
+    setStoredUser(null);
+    clearAllAuthCookies();
+};
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+export function AuthProvider({children}: { children: React.ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Initialize auth state on mount
+    useEffect(() => {
+        const initializeAuth = async () => {
+            try {
+                // Check for existing access token
+                const token = getAccessTokenFromCookie();
+
+                if (token) {
+                    // Then sync with server to get latest user data
+                    await syncUserFromServer();
+                } else {
+                    // No token at all, clear any stale data
+                    clearAuthData();
+                }
+            } catch (error) {
+                console.error('Auth initialization failed:', error);
+                clearAuthData();
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        initializeAuth();
+    }, []);
+
+    const syncUserFromServer = async (): Promise<void> => {
+        try {
+            const userResponse = await getMeApi();
+            const userData = mapMeResponseToUser(userResponse);
+
+            if (userData) {
+                setUser(userData);
+                setStoredUser(userData);
+
+                // Update access token if it was refreshed during the API call
+                const currentToken = getAccessTokenFromCookie();
+                if (currentToken && currentToken !== accessToken) {
+                    setAccessToken(currentToken);
+                    console.log('Access token updated after API call');
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to sync user from server:', error);
+        }
+    };
+
+    const refreshUser = useCallback(async (): Promise<void> => {
+        await syncUserFromServer();
+    }, []);
+
+    const login = useCallback(async (payload: LoginRequest & { rememberMe?: boolean }) => {
+        try {
+            setIsLoading(true);
+            const response = await loginApi(payload);
+
+            if (response?.accessToken) {
+                setAccessToken(response.accessToken);
+                setAccessTokenCookie(response.accessToken);
+
+                // Try to get user info from API first
+                try {
+                    const userResponse = await getMeApi();
+                    const userData = mapMeResponseToUser(userResponse);
+                    if (userData) {
+                        setUser(userData);
+                        setStoredUser(userData);
+                    }
+                } catch (error) {
+                    console.warn('Failed to fetch user info from API:', error);
+                    // Fallback to parsing from token
+                    const parsedUser = parseUserFromAccessToken(response.accessToken);
+                    if (parsedUser) {
+                        setUser(parsedUser);
+                        setStoredUser(parsedUser);
+                    }
+                }
+
+                if (isAdminFromToken(response.accessToken)) {
+                    setRoleCookie('admin');
+                }
+            }
+        } catch (error) {
+            console.error('Login failed:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const register = useCallback(async (payload: RegisterRequest) => {
+        try {
+            setIsLoading(true);
+            const response = await registerApi(payload);
+
+            if (response?.accessToken) {
+                setAccessToken(response.accessToken);
+                setAccessTokenCookie(response.accessToken);
+
+                // Parse user from token (registration usually doesn't have full user data)
+                const parsedUser = parseUserFromAccessToken(response.accessToken);
+                if (parsedUser) {
+                    setUser(parsedUser);
+                    setStoredUser(parsedUser);
+                }
+
+                if (isAdminFromToken(response.accessToken)) {
+                    setRoleCookie('admin');
+                }
+            }
+        } catch (error) {
+            console.error('Registration failed:', error);
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const logout = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            await logoutApi();
+        } catch (error) {
+            console.warn('Logout API failed:', error);
+            // Continue with local logout even if API fails
+        } finally {
+            // Always clear local auth data
+            clearAuthData();
+            setUser(null);
+            setAccessToken(null);
+            setIsLoading(false);
+        }
+    }, []);
+
+    const value = useMemo(() => ({
+        user,
+        accessToken,
+        isAuthenticated: !!user && !!accessToken,
+        isLoading,
+        login,
+        register,
+        logout,
+        refreshUser,
+    }), [user, accessToken, isLoading, login, register, logout, refreshUser]);
+
+    return (
+        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    );
 }
 
 export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
+    const ctx = useContext(AuthContext);
+    if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+    return ctx;
 }
 
 
