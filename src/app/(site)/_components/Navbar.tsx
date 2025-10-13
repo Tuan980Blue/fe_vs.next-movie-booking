@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from "next/link";
 import {useEffect, useRef, useState} from "react";
 import { useAuth } from "@/context/AuthContext";
+import { AdminOnly } from "@/components/RoleGuard";
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -133,10 +134,17 @@ const Navbar = () => {
               <>
                 {/* User Profile */}
                 <div className="hidden sm:flex items-center space-x-2 text-neutral-white">
-                  <span className="text-lg">👤</span>
+                  <AdminOnly fallback={<span className="text-lg">👤</span>}>
+                    <span className="text-lg">👑</span>
+                  </AdminOnly>
                   <span className="font-semibold text-sm">
                     {user?.fullName || user?.email?.split('@')[0] || 'User'}
                   </span>
+                  <AdminOnly>
+                    <span className="px-2 py-1 bg-accent-orange text-white text-xs rounded-full font-bold">
+                      ADMIN
+                    </span>
+                  </AdminOnly>
                 </div>
 
                 {/* User Menu */}
@@ -159,6 +167,18 @@ const Navbar = () => {
                       Vé của tôi
                     </motion.button>
                   </Link>
+                  
+                  {/* Admin Menu - Only visible to admins */}
+                  <AdminOnly>
+                    <Link href="/admin">
+                      <motion.button
+                        className="px-3 py-2 bg-neutral-800 border rounded-2xl text-white transition-all text-sm font-semibold"
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        🎭 Admin
+                      </motion.button>
+                    </Link>
+                  </AdminOnly>
                 </div>
 
                 {/* Logout Button */}

@@ -67,5 +67,5 @@ export interface UserResponse {
   status: UserStatus;
   createdAt: string;
   updatedAt?: string;
-  roles: Role[];
+  roles: string[]; // Backend trả về array of strings, không phải Role objects
 }
