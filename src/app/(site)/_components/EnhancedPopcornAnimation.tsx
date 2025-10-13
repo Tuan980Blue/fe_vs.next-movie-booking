@@ -32,7 +32,7 @@ const EnhancedPopcornAnimation = () => {
       for (let i = 0; i < count; i++) arr.push(item.icon);
     });
     return arr;
-  }, []);
+  }, [items]);
 
   // Tạo array các popcorn với vị trí và thời gian rơi khác nhau (memoized)
   type PopcornItem = {
