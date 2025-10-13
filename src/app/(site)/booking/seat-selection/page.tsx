@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState, Suspense} from "react";
 import SeatSelectionSkeleton from "@/app/(site)/booking/seat-selection/_components/SeatSelectionSkeleton";
 import {getSeatLayoutApi} from "@/service";
 import {useAuth} from "@/context/AuthContext";
@@ -22,10 +22,12 @@ interface ShowtimeMini {
     subtitle?: string | null;
 }
 
-const SeatSelectionPage = () => {
+const SeatSelectionContent = () => {
     const search = useSearchParams();
     const router = useRouter();
-    const showtime: ShowtimeMini = {
+    
+    // Memoize showtime object to prevent infinite re-renders
+    const showtime: ShowtimeMini = useMemo(() => ({
         id: search.get('showtimeId'),
         cinemaId: search.get('cinemaId'),
         roomId: search.get('roomId'),
@@ -38,7 +40,7 @@ const SeatSelectionPage = () => {
         basePriceMinor: search.get('basePriceMinor'),
         format: search.get('format'),
         subtitle: search.get('subtitle'),
-    };
+    }), [search]);
     const {user, isAuthenticated} = useAuth();
     const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
     const [secondsLeft, setSecondsLeft] = useState<number>(5 * 60);
@@ -49,16 +51,16 @@ const SeatSelectionPage = () => {
 
     // Nếu không có state (reload trang trực tiếp), điều hướng ngược lại bằng effect
     useEffect(() => {
-        if (!showtime || !showtime.cinemaId || !showtime.roomId) {
+        if (!showtime.cinemaId || !showtime.roomId) {
             router.back();
         }
-    }, [showtime, router]);
+    }, [showtime.cinemaId, showtime.roomId, router]);
 
     useEffect(() => {
         let ignore = false;
 
         async function fetchLayout() {
-            if (!showtime || !showtime.cinemaId || !showtime.roomId) return;
+            if (!showtime.cinemaId || !showtime.roomId) return;
             try {
                 setLoading(true);
                 setError('');
@@ -75,7 +77,7 @@ const SeatSelectionPage = () => {
         return () => {
             ignore = true;
         };
-    }, [showtime]);
+    }, [showtime.cinemaId, showtime.roomId]);
 
     const seatLegend = useMemo<SeatLegendItem[]>(() => layout?.seatTypes || [], [layout]);
 
@@ -524,6 +526,14 @@ const SeatSelectionPage = () => {
                 </div>
             </div>
         </div>
+    );
+};
+
+const SeatSelectionPage = () => {
+    return (
+        <Suspense fallback={<SeatSelectionSkeleton />}>
+            <SeatSelectionContent />
+        </Suspense>
     );
 };
 

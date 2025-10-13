@@ -1,14 +1,24 @@
-"use client"
+'use client'
 
-import {useState} from "react";
-import {changePasswordApi, updateProfileApi} from "@/service";
-import { useAuth } from "@/context/AuthContext";
-import type { ChangePasswordRequest, UpdateProfileRequest } from "@/models/user";
+import { useState, FormEvent, ChangeEvent } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { changePasswordApi, updateProfileApi } from "@/service";
 
-export default function UserProfilePage() {
-    const { user, isAuthenticated, isLoading, refreshFromStorage } = useAuth();
+interface EditForm {
+    fullName: string;
+    phone: string;
+}
 
-    const formatDate = (value?: string) => {
+interface PasswordForm {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
+const ProfilePage = () => {
+    const { user, isAuthenticated, isLoading, refreshUser } = useAuth();
+
+    const formatDate = (value: string | undefined): string => {
         if (!value) return '-';
         try {
             return new Date(value).toLocaleString();
@@ -19,42 +29,52 @@ export default function UserProfilePage() {
 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isChangingPassword, setIsChangingPassword] = useState<boolean>(false);
-    const [editForm, setEditForm] = useState<Pick<UpdateProfileRequest, 'fullName' | 'phone'>>({ fullName: '', phone: '' });
-    const [pwdForm, setPwdForm] = useState<{ currentPassword: string; newPassword: string; confirmPassword: string }>({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [editForm, setEditForm] = useState<EditForm>({ fullName: '', phone: '' });
+    const [pwdForm, setPwdForm] = useState<PasswordForm>({ currentPassword: '', newPassword: '', confirmPassword: '' });
 
-    const startEdit = () => {
+    // Check if user is admin
+    const isAdmin = user?.roles?.some(role => role.toLowerCase() === 'admin') || false;
+
+    const startEdit = (): void => {
         setEditForm({ fullName: user?.fullName || '', phone: user?.phone || '' });
         setIsEditing(true);
     };
-    const cancelEdit = () => setIsEditing(false);
-    const onEditChange = (e: React.ChangeEvent<HTMLInputElement>) => setEditForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-    const startChangePwd = () => setIsChangingPassword(true);
-    const cancelChangePwd = () => setIsChangingPassword(false);
-    const onPwdChange = (e: React.ChangeEvent<HTMLInputElement>) => setPwdForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    const cancelEdit = (): void => setIsEditing(false);
 
-    const handleSaveProfile = async (e: React.FormEvent<HTMLFormElement>) => {
+    const onEditChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        setEditForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    };
+
+    const startChangePwd = (): void => setIsChangingPassword(true);
+
+    const cancelChangePwd = (): void => setIsChangingPassword(false);
+
+    const onPwdChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        setPwdForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    };
+
+    const handleSaveProfile = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        const payload: UpdateProfileRequest = { fullName: editForm.fullName, phone: editForm.phone };
+        const payload = { fullName: editForm.fullName, phone: editForm.phone };
         try {
             await updateProfileApi(payload);
-            // Đồng bộ lại auth state từ storage và /me
-            await refreshFromStorage();
+            // Gọi lại /users/me để đồng bộ đầy đủ (status/updatedAt/roles...)
+            await refreshUser();
             setIsEditing(false);
         } catch (err) {
             alert('Cập nhật hồ sơ thất bại');
         }
     };
 
-    const handleChangePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleChangePassword = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (pwdForm.newPassword !== pwdForm.confirmPassword) {
             alert('Mật khẩu xác nhận không khớp');
             return;
         }
         try {
-            const payload: ChangePasswordRequest = { currentPassword: pwdForm.currentPassword, newPassword: pwdForm.newPassword };
-            await changePasswordApi(payload);
+            await changePasswordApi({ currentPassword: pwdForm.currentPassword, newPassword: pwdForm.newPassword });
             alert('Đổi mật khẩu thành công');
             setIsChangingPassword(false);
             setPwdForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
@@ -95,8 +115,8 @@ export default function UserProfilePage() {
                                     </div>
                                 </div>
                                 <div className="mt-4 sm:mt-0">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${(((user?.roles||[])[0]||'').toLowerCase()==='admin') ? 'bg-green-100 text-green-700' : 'bg-neutral-lightGray text-neutral-darkGray'}`}>
-                    {(((user?.roles||[])[0]||'').toLowerCase()==='admin') ? 'Admin' : 'User'}
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${isAdmin ? 'bg-green-100 text-green-700' : 'bg-neutral-lightGray text-neutral-darkGray'}`}>
+                    {isAdmin ? 'Admin' : 'User'}
                   </span>
                                 </div>
                             </div>
@@ -165,11 +185,11 @@ export default function UserProfilePage() {
                                 </div>
                                 <div className="border rounded-xl p-5">
                                     <div className="text-neutral-lightGray text-sm mb-1">Trạng thái</div>
-                                    <div className="font-semibold text-neutral-darkGray">{user.status || '-'}</div>
+                                    <div className="font-semibold text-neutral-darkGray">{user.status === 1 ? 'Hoạt động' : user.status === 2 ? 'Không hoạt động' : user.status === 3 ? 'Bị cấm' : '-'}</div>
                                 </div>
                                 <div className="border rounded-xl p-5">
                                     <div className="text-neutral-lightGray text-sm mb-1">Vai trò</div>
-                                    <div className="font-semibold text-neutral-darkGray capitalize">{(user.roles && user.roles[0]) || '-'}</div>
+                                    <div className="font-semibold text-neutral-darkGray capitalize">{user.roles?.[0] || '-'}</div>
                                 </div>
                                 <div className="border rounded-xl p-5">
                                     <div className="text-neutral-lightGray text-sm mb-1">Tạo lúc</div>
@@ -194,4 +214,6 @@ export default function UserProfilePage() {
             </div>
         </div>
     );
-}
+};
+
+export default ProfilePage;
