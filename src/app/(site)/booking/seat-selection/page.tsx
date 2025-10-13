@@ -1,6 +1,6 @@
 "use client"
 
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState, Suspense} from "react";
 import SeatSelectionSkeleton from "@/app/(site)/booking/seat-selection/_components/SeatSelectionSkeleton";
 import {getSeatLayoutApi} from "@/service";
 import {useAuth} from "@/context/AuthContext";
@@ -22,7 +22,7 @@ interface ShowtimeMini {
     subtitle?: string | null;
 }
 
-const SeatSelectionPage = () => {
+const SeatSelectionContent = () => {
     const search = useSearchParams();
     const router = useRouter();
     const showtime: ShowtimeMini = {
@@ -524,6 +524,14 @@ const SeatSelectionPage = () => {
                 </div>
             </div>
         </div>
+    );
+};
+
+const SeatSelectionPage = () => {
+    return (
+        <Suspense fallback={<SeatSelectionSkeleton />}>
+            <SeatSelectionContent />
+        </Suspense>
     );
 };
 
