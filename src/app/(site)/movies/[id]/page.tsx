@@ -4,7 +4,7 @@ import {motion, AnimatePresence} from 'framer-motion';
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import Link from "next/link";
-import BookingForm from "@/app/(site)/booking/_components/BookingForm";
+import BookingForm from "@/app/(no-navbar)/booking/_components/BookingForm";
 import MovieDetailSkeleton from "@/app/(site)/movies/[id]/_components/MovieDetailSkeleton";
 import Showtimes from "@/app/(site)/movies/[id]/_components/Showtimes";
 import {getMovieDetailApi} from "@/service";
@@ -70,10 +70,10 @@ const MovieDetailPage = () => {
     if (error || !movie) {
         return (
             <div
-                className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-purple to-primary-pink">
+                className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-6xl mb-4">🎬</div>
-                    <h2 className="text-2xl font-bold text-white mb-4">Không tìm thấy phim</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Không tìm thấy phim</h2>
                     <p className="text-white opacity-75 mb-6">{error || 'Phim không tồn tại'}</p>
                     <Link
                         href="/movies"
@@ -89,7 +89,7 @@ const MovieDetailPage = () => {
     const youtubeId = getYouTubeId(movie.trailerUrl);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-purple to-primary-pink mb-8 lg:mb-16">
+        <div className="min-h-screen mb-8 lg:mb-16">
             {/* Hero Section - Cinema Style */}
             <div className="relative h-[85vh] lg:h-[90vh] overflow-hidden">
                 {/* Dynamic Backdrop với Parallax Effect */}
