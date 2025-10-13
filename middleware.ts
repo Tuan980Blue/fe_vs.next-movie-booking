@@ -38,11 +38,19 @@ function getRolesFromToken(token: string): string[] {
   const payload = decodeJwtPayload(token);
   if (!payload) return [];
   
+  // Debug: Log the entire payload to see what claims are available
+  console.log('JWT Payload in middleware:', payload);
+  
   const roles = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string ||
                payload.role as string ||
                payload.roles as string[];
   
-  return Array.isArray(roles) ? roles : roles ? [roles] : [];
+  console.log('Role claim found in middleware:', roles);
+  
+  const result = Array.isArray(roles) ? roles : roles ? [roles] : [];
+  console.log('Final roles in middleware:', result);
+  
+  return result;
 }
 
 // Helper function to check if user is admin

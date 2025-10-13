@@ -16,7 +16,7 @@ import {
     setRoleCookie,
     clearAllAuthCookies
 } from "@/lib/auth/cookies";
-import {isAdminFromToken} from "@/lib/auth/jwt";
+import {isAdminFromToken, getRolesFromToken} from "@/lib/auth/jwt";
 
 type AuthContextValue = {
     user: User | null;
@@ -141,8 +141,12 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
                     }
                 }
 
-                if (isAdminFromToken(response.accessToken)) {
+                // Set role cookie based on token
+                const roles = getRolesFromToken(response.accessToken);
+                if (roles.includes('admin') || roles.includes('Admin')) {
                     setRoleCookie('admin');
+                } else {
+                    setRoleCookie('user');
                 }
             }
         } catch (error) {
@@ -169,8 +173,12 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
                     setStoredUser(parsedUser);
                 }
 
-                if (isAdminFromToken(response.accessToken)) {
+                // Set role cookie based on token
+                const roles = getRolesFromToken(response.accessToken);
+                if (roles.includes('admin') || roles.includes('Admin')) {
                     setRoleCookie('admin');
+                } else {
+                    setRoleCookie('user');
                 }
             }
         } catch (error) {

@@ -36,11 +36,16 @@ export function parseUserFromAccessToken(accessToken: string): User | null {
   const payload = decodeJwtPayload(accessToken);
   if (!payload) return null;
   
+  // Debug: Log the entire payload to see what claims are available
+  console.log('JWT Payload:', payload);
+  
   // Extract roles from various possible claim formats
   let roles: string[] = [];
   const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string ||
                    payload.role as string ||
                    payload.roles as string[];
+  
+  console.log('Role claim found:', roleClaim);
   
   if (Array.isArray(roleClaim)) {
     roles = roleClaim;
@@ -49,6 +54,8 @@ export function parseUserFromAccessToken(accessToken: string): User | null {
   } else {
     roles = ['user']; // Default role
   }
+  
+  console.log('Parsed roles:', roles);
   
   // Extract full name from various possible claim formats
   const fullName = (payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] as string) ||
@@ -76,9 +83,9 @@ export async function getMeApi() {
 export function mapMeResponseToUser(me: UserResponse | null): User | null {
   if (!me) return null;
   
-  // Extract role names from roles array
+  // Backend trả về roles là array of strings
   const roles = Array.isArray(me.roles) 
-    ? me.roles.map((r) => (r.name || '').toString().toLowerCase()).filter(Boolean)
+    ? me.roles.map(r => r.toLowerCase()).filter(Boolean)
     : [];
   
   return {

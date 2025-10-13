@@ -50,12 +50,20 @@ export function getRolesFromToken(token: string): string[] {
   const payload = decodeJwtPayload(token);
   if (!payload) return [];
   
+  // Debug: Log the entire payload to see what claims are available
+  console.log('JWT Payload in getRolesFromToken:', payload);
+  
   // Check different possible role claim names
   const roles = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string ||
                 payload.role as string ||
                 payload.roles as string[];
   
-  return Array.isArray(roles) ? roles : roles ? [roles] : [];
+  console.log('Role claim found in getRolesFromToken:', roles);
+  
+  const result = Array.isArray(roles) ? roles : roles ? [roles] : [];
+  console.log('Final roles in getRolesFromToken:', result);
+  
+  return result;
 }
 
 /**
