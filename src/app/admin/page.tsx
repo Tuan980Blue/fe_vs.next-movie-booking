@@ -113,7 +113,7 @@ export default function AdminDashboard() {
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-gray-800">Đơn đặt vé mới</p>
-                                <p className="text-sm text-gray-600">Đơn đặt vé #12345 cho phim "Avengers"</p>
+                                <p className="text-sm text-gray-600">Đơn đặt vé #12345 cho phim Avengers</p>
                             </div>
                             <span className="text-sm text-gray-500">15 phút trước</span>
                         </div>
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-gray-800">Phim mới được thêm</p>
-                                <p className="text-sm text-gray-600">Phim "Spider-Man: No Way Home" đã được thêm vào hệ thống</p>
+                                <p className="text-sm text-gray-600">Phim Spider-Man: No Way Home đã được thêm vào hệ thống</p>
                             </div>
                             <span className="text-sm text-gray-500">1 giờ trước</span>
                         </div>
