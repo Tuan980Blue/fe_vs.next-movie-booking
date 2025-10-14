@@ -33,6 +33,8 @@ export interface Role {
 export interface LoginRequest {
   email: string;
   password: string;
+  deviceId?: string;
+  userAgent?: string;
 }
 
 export interface RegisterRequest {

@@ -1,86 +1,36 @@
 "use client";
 
-import {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {
-    loginApi,
-    registerApi,
-    getMeApi,
-    logoutApi,
-    parseUserFromAccessToken,
-    mapMeResponseToUser
-} from "@/service/services/authService";
-import type {LoginRequest, RegisterRequest, User} from "@/models/user";
-import {
-    setAccessTokenCookie,
-    getAccessTokenFromCookie,
-    setRoleCookie,
-    clearAllAuthCookies
-} from "@/lib/auth/cookies";
-import {isAdminFromToken, getRolesFromToken} from "@/lib/auth/jwt";
+import {createContext, useContext, useEffect, useState} from "react";
+import {getMeApi, loginApi, logoutApi, registerApi, mapMeResponseToUser} from "@/service";
+import type {User} from "@/models/user";
+import {clearAccessToken} from "@/service/auth/cookie";
 
 type AuthContextValue = {
     user: User | null;
-    accessToken: string | null;
-    isAuthenticated: boolean;
     isLoading: boolean;
-    login: (payload: LoginRequest & { rememberMe?: boolean }) => Promise<void>;
-    register: (payload: RegisterRequest) => Promise<void>;
+    isAuthenticated: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    register: (email: string, password: string, fullName: string) => Promise<void>;
     logout: () => Promise<void>;
-    refreshUser: () => Promise<void>;
+    refreshMe: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-// Storage keys
-const USER_KEY = 'user';
-
-// Helper functions
-const setStoredUser = (user: User | null): void => {
-    if (typeof window === 'undefined') return;
-    if (user) {
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
-    } else {
-        localStorage.removeItem(USER_KEY);
-    }
-};
-
-const getStoredUser = (): User | null => {
-    if (typeof window === 'undefined') return null;
-    try {
-        const stored = localStorage.getItem(USER_KEY);
-        return stored ? JSON.parse(stored) : null;
-    } catch {
-        return null;
-    }
-};
-
-const clearAuthData = (): void => {
-    setStoredUser(null);
-    clearAllAuthCookies();
-};
 
 export function AuthProvider({children}: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
+
     const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
 
     // Initialize auth state on mount
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                // Check for existing access token
-                const token = getAccessTokenFromCookie();
-
-                if (token) {
-                    // Then sync with server to get latest user data
-                    await syncUserFromServer();
-                } else {
-                    // No token at all, clear any stale data
-                    clearAuthData();
-                }
+                // We cannot read HttpOnly refresh cookie on client; just try syncing.
+                await syncUserFromServer();
             } catch (error) {
-                console.error('Auth initialization failed:', error);
-                clearAuthData();
+
             } finally {
                 setIsLoading(false);
             }
@@ -91,130 +41,46 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
 
     const syncUserFromServer = async (): Promise<void> => {
         try {
-            const userResponse = await getMeApi();
-            const userData = mapMeResponseToUser(userResponse);
-
-            if (userData) {
-                setUser(userData);
-                setStoredUser(userData);
-
-                // Update access token if it was refreshed during the API call
-                const currentToken = getAccessTokenFromCookie();
-                if (currentToken && currentToken !== accessToken) {
-                    setAccessToken(currentToken);
-                    console.log('Access token updated after API call');
-                }
-            }
+            const me = await getMeApi();
+            const mapped = mapMeResponseToUser(me);
+            if (mapped) setUser(mapped);
         } catch (error) {
             console.warn('Failed to sync user from server:', error);
+            setUser(null);
         }
     };
 
-    const refreshUser = useCallback(async (): Promise<void> => {
+    const login = async (email: string, password: string): Promise<void> => {
+        await loginApi({ email, password });
+        // accessToken stored by authService; now fetch user profile
         await syncUserFromServer();
-    }, []);
+    };
 
-    const login = useCallback(async (payload: LoginRequest & { rememberMe?: boolean }) => {
+    const register = async (email: string, password: string, fullName: string): Promise<void> => {
+        await registerApi({ email, password, fullName });
+        await syncUserFromServer();
+    };
+
+    const logout = async (): Promise<void> => {
         try {
-            setIsLoading(true);
-            const response = await loginApi(payload);
-
-            if (response?.accessToken) {
-                setAccessToken(response.accessToken);
-                setAccessTokenCookie(response.accessToken);
-
-                // Try to get user info from API first
-                try {
-                    const userResponse = await getMeApi();
-                    const userData = mapMeResponseToUser(userResponse);
-                    if (userData) {
-                        setUser(userData);
-                        setStoredUser(userData);
-                    }
-                } catch (error) {
-                    console.warn('Failed to fetch user info from API:', error);
-                    // Fallback to parsing from token
-                    const parsedUser = parseUserFromAccessToken(response.accessToken);
-                    if (parsedUser) {
-                        setUser(parsedUser);
-                        setStoredUser(parsedUser);
-                    }
-                }
-
-                // Set role cookie based on token
-                const roles = getRolesFromToken(response.accessToken);
-                if (roles.includes('admin') || roles.includes('Admin')) {
-                    setRoleCookie('admin');
-                } else {
-                    setRoleCookie('user');
-                }
-            }
-        } catch (error) {
-            console.error('Login failed:', error);
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    const register = useCallback(async (payload: RegisterRequest) => {
-        try {
-            setIsLoading(true);
-            const response = await registerApi(payload);
-
-            if (response?.accessToken) {
-                setAccessToken(response.accessToken);
-                setAccessTokenCookie(response.accessToken);
-
-                // Parse user from token (registration usually doesn't have full user data)
-                const parsedUser = parseUserFromAccessToken(response.accessToken);
-                if (parsedUser) {
-                    setUser(parsedUser);
-                    setStoredUser(parsedUser);
-                }
-
-                // Set role cookie based on token
-                const roles = getRolesFromToken(response.accessToken);
-                if (roles.includes('admin') || roles.includes('Admin')) {
-                    setRoleCookie('admin');
-                } else {
-                    setRoleCookie('user');
-                }
-            }
-        } catch (error) {
-            console.error('Registration failed:', error);
-            throw error;
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    const logout = useCallback(async () => {
-        try {
-            setIsLoading(true);
             await logoutApi();
-        } catch (error) {
-            console.warn('Logout API failed:', error);
-            // Continue with local logout even if API fails
         } finally {
-            // Always clear local auth data
-            clearAuthData();
+            clearAccessToken();
             setUser(null);
-            setAccessToken(null);
-            setIsLoading(false);
         }
-    }, []);
+    };
 
-    const value = useMemo(() => ({
+    const value: AuthContextValue = {
         user,
-        accessToken,
-        isAuthenticated: !!user && !!accessToken,
         isLoading,
+        isAuthenticated: !!user,
         login,
         register,
         logout,
-        refreshUser,
-    }), [user, accessToken, isLoading, login, register, logout, refreshUser]);
+        refreshMe: syncUserFromServer,
+    };
+
+
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

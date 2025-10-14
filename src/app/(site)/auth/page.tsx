@@ -6,21 +6,21 @@ import {useState} from "react";
 import EnhancedPopcornAnimation from "@/app/(site)/_components/EnhancedPopcornAnimation";
 import LoginForm from "@/app/(site)/auth/_components/LoginForm";
 import RegisterForm from "@/app/(site)/auth/_components/RegisterForm";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import {useAuth} from "@/context/AuthContext";
 
 const AuthPage = () => {
     const [currentView, setCurrentView] = useState('login'); // 'login', 'register'
-    const { login, register, isAuthenticated } = useAuth();
+    const { login, register } = useAuth();
     const router = useRouter();
 
-    const handleLogin = async (userData: { email: string; password: string; rememberMe?: boolean }) => {
-        await login({ email: userData.email, password: userData.password, rememberMe: userData.rememberMe });
+    const handleLogin = async (userData: { email: string; password: string}) => {
+        await login(userData.email, userData.password);
         router.push('/');
     };
 
     const handleRegister = async (userData: { fullName: string; email: string; password: string }) => {
-        await register({ fullName: userData.fullName, email: userData.email, password: userData.password });
+        await register(userData.email, userData.password, userData.fullName);
         setCurrentView('login');
     };
 

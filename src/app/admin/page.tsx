@@ -2,7 +2,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { AdminOnly } from "@/components/RoleGuard";
+import { AdminOnly } from "@/context/RoleGuard";
 
 export default function AdminDashboard() {
     const { user } = useAuth();

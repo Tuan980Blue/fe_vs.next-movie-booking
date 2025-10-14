@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { AdminOnly } from "@/components/RoleGuard";
+import { AdminOnly } from "@/context/RoleGuard";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
