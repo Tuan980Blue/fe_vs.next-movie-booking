@@ -3,6 +3,8 @@
 import endpoints from '../api/endpoints';
 import httpClient from '../api/httpClient';
 import { LoginRequest, RegisterRequest, User, UserResponse } from '../../models/user';
+import { setAccessToken, clearAccessToken } from '@/service/auth/cookie';
+import { getOrCreateDeviceId, getUserAgent } from '@/service/auth/device';
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
@@ -15,20 +17,29 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 }
 
 export async function loginApi({ email, password }: LoginRequest) {
-  const url = endpoints.auth.login; // baseURL đã có '/api' trong httpClient
-  const { data } = await httpClient.post(url, { email, password });
+  const url = endpoints.auth.login;
+  const deviceId = getOrCreateDeviceId();
+  const userAgent = getUserAgent();
+  const { data } = await httpClient.post(url, { email, password, deviceId, userAgent });
+  if (data?.accessToken) {
+    setAccessToken(data.accessToken);
+  }
   return data;
 }
 
 export async function registerApi({ email, password, fullName }: RegisterRequest) {
   const url = endpoints.auth.register;
   const { data } = await httpClient.post(url, { email, password, fullName });
+  if (data?.accessToken) {
+    setAccessToken(data.accessToken);
+  }
   return data;
 }
 
 export async function logoutApi() {
   const url = endpoints.auth.logout;
   const { data } = await httpClient.post(url, {});
+  clearAccessToken();
   return data;
 }
 

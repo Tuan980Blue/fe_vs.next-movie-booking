@@ -16,7 +16,7 @@ interface PasswordForm {
 }
 
 const ProfilePage = () => {
-    const { user, isAuthenticated, isLoading, refreshUser } = useAuth();
+    const { user, isAuthenticated, isLoading, refreshMe } = useAuth();
 
     const formatDate = (value: string | undefined): string => {
         if (!value) return '-';
@@ -60,7 +60,7 @@ const ProfilePage = () => {
         try {
             await updateProfileApi(payload);
             // Gọi lại /users/me để đồng bộ đầy đủ (status/updatedAt/roles...)
-            await refreshUser();
+            await refreshMe();
             setIsEditing(false);
         } catch (err) {
             alert('Cập nhật hồ sơ thất bại');
