@@ -9,22 +9,27 @@ export default function AccessDeniedPage() {
     const router = useRouter();
     const [countdown, setCountdown] = useState(10);
 
+    //useEffect 1: giam countdown
     useEffect(() => {
         const timer = setInterval(() => {
-            setCountdown((prev) => {
-                if (prev <= 1) {
-                    router.push("/");
-                    return 0;
-                }
-                return prev - 1;
-            });
+            setCountdown((prev) => Math.max(prev - 1, 0));
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [router]);
+    }, []);
+
+    //useEffect 1: redirect khi countdown = 0
+    useEffect(() => {
+        if (countdown == 0)
+        {
+            router.push("/");
+        }
+    }, [countdown, router]);
+    //ESLint rule (và React team) bắt buộc bạn phải thêm nó vào dependency array
+    // — để đảm bảo tính an toàn & ổn định của hook
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-gradient-to-br from-neutral-black via-cinema-navy to-neutral-black relative overflow-hidden">
+        <div className="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-gray-900 relative overflow-hidden">
             {/* Background Effects */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.15),transparent_50%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(139,92,246,0.1),transparent_50%)]" />
