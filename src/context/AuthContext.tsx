@@ -25,12 +25,17 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
 
     // Initialize auth state on mount
     useEffect(() => {
+        // //Check login flag
+        const hasLoggedInFlag = document.cookie.includes('logged_in=true'); //có chứa đoạn văn bản
+        if (!hasLoggedInFlag) {
+            setIsLoading(false);
+            return;
+        }
+
         const initializeAuth = async () => {
             try {
-                // We cannot read HttpOnly refresh cookie on client; just try syncing.
                 await syncUserFromServer();
             } catch (error) {
-
             } finally {
                 setIsLoading(false);
             }

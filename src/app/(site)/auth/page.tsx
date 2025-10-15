@@ -6,22 +6,27 @@ import {useState} from "react";
 import EnhancedPopcornAnimation from "@/app/(site)/_components/EnhancedPopcornAnimation";
 import LoginForm from "@/app/(site)/auth/_components/LoginForm";
 import RegisterForm from "@/app/(site)/auth/_components/RegisterForm";
-import { useRouter } from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import {useAuth} from "@/context/AuthContext";
 
 const AuthPage = () => {
     const [currentView, setCurrentView] = useState('login'); // 'login', 'register'
     const { login, register } = useAuth();
-    const router = useRouter();
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const callbackUrl = searchParams.get('callbackUrl') || '/'
 
     const handleLogin = async (userData: { email: string; password: string}) => {
         await login(userData.email, userData.password);
-        router.push('/');
+        // Quay lại trang trước
+        router.push(callbackUrl)
     };
 
     const handleRegister = async (userData: { fullName: string; email: string; password: string }) => {
         await register(userData.email, userData.password, userData.fullName);
         setCurrentView('login');
+
+        router.push('/')
     };
 
     const switchToRegister = () => {
