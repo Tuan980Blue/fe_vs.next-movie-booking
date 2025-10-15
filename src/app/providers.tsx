@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
 import { AuthProvider } from "@/context/AuthContext";
+import {Provider} from "react-redux";
+import {store} from "@/store/store";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function AppProviders({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      {children}
-    </AuthProvider>
+      <Provider store={store}>
+          <AuthProvider>
+              {children}
+          </AuthProvider>
+      </Provider>
   );
 }
 

@@ -1,19 +1,12 @@
-
 "use client";
 
-import { useAuth } from "@/context/AuthContext";
-import { AdminOnly } from "@/context/RoleGuard";
+import {useAuth} from "@/context/AuthContext";
 
 export default function AdminDashboard() {
-    const { user } = useAuth();
+    const {user} = useAuth();
 
     return (
-        <AdminOnly fallback={
-            <div className="text-center py-12">
-                <h1 className="text-2xl font-bold text-gray-800 mb-4">Không có quyền truy cập</h1>
-                <p className="text-gray-600">Bạn cần quyền admin để xem trang này.</p>
-            </div>
-        }>
+        <div>
             <div className="space-y-6">
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-sm p-6">
@@ -124,7 +117,8 @@ export default function AdminDashboard() {
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium text-gray-800">Phim mới được thêm</p>
-                                <p className="text-sm text-gray-600">Phim Spider-Man: No Way Home đã được thêm vào hệ thống</p>
+                                <p className="text-sm text-gray-600">Phim Spider-Man: No Way Home đã được thêm vào hệ
+                                    thống</p>
                             </div>
                             <span className="text-sm text-gray-500">1 giờ trước</span>
                         </div>
@@ -135,7 +129,8 @@ export default function AdminDashboard() {
                 <div className="bg-white rounded-lg shadow-sm p-6">
                     <h2 className="text-xl font-bold text-gray-800 mb-4">Thao tác nhanh</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button className="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                        <button
+                            className="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
                             <div className="text-center">
                                 <span className="text-2xl mb-2 block">👥</span>
                                 <p className="font-medium text-blue-800">Quản lý người dùng</p>
@@ -143,7 +138,8 @@ export default function AdminDashboard() {
                             </div>
                         </button>
 
-                        <button className="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
+                        <button
+                            className="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors">
                             <div className="text-center">
                                 <span className="text-2xl mb-2 block">🎬</span>
                                 <p className="font-medium text-purple-800">Quản lý phim</p>
@@ -151,7 +147,8 @@ export default function AdminDashboard() {
                             </div>
                         </button>
 
-                        <button className="p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
+                        <button
+                            className="p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
                             <div className="text-center">
                                 <span className="text-2xl mb-2 block">📊</span>
                                 <p className="font-medium text-green-800">Báo cáo thống kê</p>
@@ -161,6 +158,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
-        </AdminOnly>
+        </div>
     );
 }
