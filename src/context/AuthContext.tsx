@@ -85,8 +85,6 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
         refreshMe: syncUserFromServer,
     };
 
-
-
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
