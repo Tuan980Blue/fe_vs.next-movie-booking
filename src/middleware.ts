@@ -12,15 +12,11 @@ export function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const refreshToken = request.cookies.get("refresh_token")?.value;
 
-    //Test
-    console.log("Middleware đang chạy:", request);
-
     // Danh sách route PUBLIC nhưng path con của chúng cần private
     const publicRoutes = ['/auth', '/booking']
 
     const isPublic = publicRoutes.some((route) => pathname === route)
 
-    // Nếu KHÔNG thuộc public và chưa có token
     if (!refreshToken && !isPublic) {
         // Gắn url cũ cho url mới để sau này callback
         const redirectUrl = `/auth?callbackUrl=${encodeURIComponent(pathname)}`
@@ -33,7 +29,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // matcher giúp giới hạn hoặc ngoại trừ những route mà middleware áp dụng
     matcher: [
         "/admin/:path*",
         "/user/:path*",
