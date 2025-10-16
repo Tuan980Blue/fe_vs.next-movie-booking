@@ -1,13 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
+import moviesReducer from '@/store/slices/moviesSlice'
 
 //Hàm configureStore là cách tạo store (kho chứa state trung tâm) trong Redux Toolkit.
 
 export const store = configureStore({
     reducer: {
         //// nơi khai báo các slice reducer
+        movies: moviesReducer,
     },
-    // middleware: (getDefaultMiddleware) =>
-    //     getDefaultMiddleware().,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware(),
 })
 
 export type RootState = ReturnType<typeof store.getState>
