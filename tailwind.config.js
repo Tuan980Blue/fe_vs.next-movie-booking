@@ -10,7 +10,7 @@ module.exports = {
       colors: {
         // Primary colors
         'primary-pink': '#ec4899',
-        'primary-purple': '#8b5cf6',
+        'primary-purple': '#271659',
         'primary-black': '#0a0a0a',
         
         // Accent colors

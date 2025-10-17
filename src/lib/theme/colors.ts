@@ -1,7 +1,7 @@
 export const COLORS = {
   PRIMARY: {
     PINK: "#ec4899",
-    PURPLE: "#8b5cf6",
+    PURPLE: "#1f133a",
     BLACK: "#0a0a0a",
   },
   ACCENT: {

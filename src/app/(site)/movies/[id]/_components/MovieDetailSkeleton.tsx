@@ -1,7 +1,7 @@
 
 const MovieDetailSkeleton = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-purple to-primary-pink">
+    <div className="min-h-screen bg-gray-800">
       {/* Hero Section Skeleton */}
       <div className="relative h-[85vh] lg:h-[90vh] overflow-hidden">
         {/* Backdrop Skeleton */}
