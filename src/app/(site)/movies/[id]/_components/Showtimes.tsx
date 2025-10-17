@@ -114,7 +114,7 @@ const Showtimes = ({ movieId }: { movieId: string }) => {
                                         });
                                         router.push(`/booking/seat-selection?${params.toString()}`);
                                     }}
-                                    className="px-5 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-primary-pink hover:bg-cinema-neonPink hover:text-white border border-primary-pink hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary-pink/40"
+                                    className="px-5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer bg-white text-primary-pink hover:bg-cinema-neonPink hover:text-white border border-primary-pink hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary-pink/40"
                                 >
                                     {formatTime(item.startUtc)}
                                 </button>

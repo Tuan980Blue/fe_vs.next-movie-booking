@@ -124,8 +124,7 @@ const Promotions = () => {
                       </span>
                     )}
                     <span
-                      className="text-lg lg:text-2xl italic font-semibold flex items-center gap-2"
-                      style={{ color: COLORS.PRIMARY.PINK }}
+                      className="text-amber-50 text-lg lg:text-2xl italic font-semibold flex items-center gap-2"
                     >
                       <span>💸</span>
                       {promo.salePrice}
@@ -191,7 +190,7 @@ const Promotions = () => {
           <Link
               href="/promotions"
             className="inline-block mt-4 text-sm font-semibold hover:underline"
-            style={{ color: COLORS.PRIMARY.PINK }}
+            style={{ color: COLORS.ACCENT.ORANGE }}
           >
             Xem tất cả khuyến mãi →
           </Link>
