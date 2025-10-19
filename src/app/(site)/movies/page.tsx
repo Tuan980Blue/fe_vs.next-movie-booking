@@ -71,12 +71,9 @@ const MoviesPage = () => {
     const handleNext = () => setPage((p) => Math.min(totalPages, p + 1));
 
     return (
-        <div className="min-h-screen py-16 px-4 lg:px-8 bg-gradient-to-b from-[#2a0a3a] via-[#2a0a3a]/60 to-transparent">
+        <div className="min-h-screen py-4 lg:py-8 px-4 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-10">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-white mb-3">
-                        Danh sách phim
-                    </h1>
                     <p className="text-neutral-white/80 text-base md:text-lg">
                         Khám phá phim đang chiếu và sắp chiếu tại rạp
                     </p>

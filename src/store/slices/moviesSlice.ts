@@ -82,7 +82,5 @@ const moviesSlice = createSlice({
 
 export const { setPage, setPageSize, clearError } = moviesSlice.actions
 
-console.log("Slice",moviesSlice)
-
 export default moviesSlice.reducer
 

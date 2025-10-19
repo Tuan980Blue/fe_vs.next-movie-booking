@@ -11,7 +11,7 @@ const StepsHeader = () => {
     const step = path.includes('/complete') ? 3 : path.includes('/payment') ? 2 : 1;
 
     const steps = [
-        {id: 1, label: 'Chọn ghế', icon: '🎫'},
+        {id: 1, label: 'Chọn ghế', icon: '💺'},
         {id: 2, label: 'Thanh toán', icon: '💳'},
         {id: 3, label: 'Hoàn tất', icon: '✅'},
     ];
