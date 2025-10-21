@@ -1,6 +1,6 @@
 ## 📺 PreView Web
 
-👉 [https://cinema-sigma-flame.vercel.app/](https://touchcinema-ta.vercel.app)
+👉 [https://touchcinema-ta.vercel.app/](https://touchcinema-ta.vercel.app)
 
 # 🎬 Web Đặt Vé Xem Phim
 
