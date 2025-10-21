@@ -5,6 +5,10 @@ import MoviePageSkeleton from "@/app/(site)/movies/_components/MoviePageSkeleton
 import {getMoviesApi} from "@/service";
 import Link from "next/link";
 import { MovieStatus, type MovieResponse, type MovieListResponse, type MovieSearchParams } from "@/models/movie";
+import type { Metadata } from "next";
+
+// Note: Since this is a client component, we can't export metadata here
+// We'll need to create a separate metadata file or move metadata to a parent layout
 
 const MoviesPage = () => {
     const [movies, setMovies] = useState<MovieResponse[]>([]);
