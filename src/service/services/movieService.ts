@@ -81,12 +81,5 @@ export async function getMovieStatsApi(): Promise<{
   return data;
 }
 
-/**
- * Get all genres for movie forms
- */
-export async function getGenresApi(): Promise<GenreResponse[]> {
-  const { data } = await httpClient.get(endpoints.genres.list);
-  return data;
-}
 
 

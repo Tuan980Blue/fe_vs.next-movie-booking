@@ -14,9 +14,9 @@ import {
   updateMovieApi, 
   deleteMovieApi, 
   changeMovieStatusApi,
-  getMovieStatsApi,
-  getGenresApi
+  getMovieStatsApi
 } from '@/service/services/movieService'
+import { getGenresApi } from '@/service/services/genreService'
 
 export interface MoviesState {
     items: MovieResponse[]
