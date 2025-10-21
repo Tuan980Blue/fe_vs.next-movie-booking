@@ -29,22 +29,12 @@ const PaymentPage = () => {
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <motion.div
-                    className="text-center mb-12"
+                    className="text-center mb-6"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <motion.div
-                        className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-primary-pink to-accent-orange rounded-full mb-6"
-                        animate={{ rotate: [0, 5, -5, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                    >
-                        <span className="text-3xl">💳</span>
-                    </motion.div>
-                    <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-                        Thanh toán vé xem phim
-                    </h1>
-                    <p className="text-white/80 text-lg max-w-2xl mx-auto">
+                    <p className="text-pink-500 italic text-lg max-w-2xl mx-auto">
                         Chọn phương thức thanh toán phù hợp và hoàn tất đặt vé của bạn
                     </p>
                 </motion.div>
@@ -76,7 +66,6 @@ const PaymentPage = () => {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.3 + index * 0.1 }}
-                                        whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
                                         <div className="flex items-center gap-4">
@@ -121,7 +110,7 @@ const PaymentPage = () => {
                             transition={{ duration: 0.6, delay: 0.4 }}
                         >
                             {/* Header */}
-                            <div className="bg-gradient-to-r from-primary-pink via-accent-orange to-accent-yellow px-6 py-4">
+                            <div className="bg-primary-pink px-6 py-4">
                                 <div className="flex items-center gap-3 text-white">
                                     <span className="text-xl">🎫</span>
                                     <span className="font-bold">Tóm tắt đơn hàng</span>
@@ -163,9 +152,8 @@ const PaymentPage = () => {
                                     className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
                                         isProcessing
                                             ? 'bg-neutral-lightGray cursor-not-allowed opacity-50'
-                                            : 'bg-gradient-to-r from-primary-pink via-accent-orange to-accent-yellow text-white hover:shadow-2xl hover:scale-105'
+                                            : 'bg-primary-pink text-white cursor-pointer'
                                     }`}
-                                    whileHover={!isProcessing ? { scale: 1.02 } : {}}
                                     whileTap={!isProcessing ? { scale: 0.98 } : {}}
                                 >
                                     {isProcessing ? (

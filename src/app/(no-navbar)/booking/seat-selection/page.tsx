@@ -5,10 +5,10 @@ import {motion} from "framer-motion";
 import SeatSelectionSkeleton from "@/app/(no-navbar)/booking/seat-selection/_components/SeatSelectionSkeleton";
 import {getSeatLayoutApi} from "@/service";
 import {useAuth} from "@/context/AuthContext";
-import { useRouter, useSearchParams } from "next/navigation";
-import type { SeatLayoutUi, SeatUi, SeatLegendItem } from "@/models/seat";
+import {useRouter, useSearchParams} from "next/navigation";
+import type {SeatLayoutUi, SeatUi, SeatLegendItem} from "@/models/seat";
 
-interface ShowtimeMini {
+interface Showtime {
     id: string | null;
     cinemaId: string | null;
     roomId: string | null;
@@ -24,24 +24,12 @@ interface ShowtimeMini {
 }
 
 const SeatSelectionContent = () => {
-    const search = useSearchParams();
     const router = useRouter();
-    
-    // Memoize showtime object to prevent infinite re-renders
-    const showtime: ShowtimeMini = useMemo(() => ({
-        id: search.get('showtimeId'),
-        cinemaId: search.get('cinemaId'),
-        roomId: search.get('roomId'),
-        startUtc: search.get('startUtc'),
-        endUtc: search.get('endUtc'),
-        movieTitle: search.get('movieTitle'),
-        roomName: search.get('roomName'),
-        auditoriumName: search.get('auditoriumName'),
-        cinemaName: search.get('cinemaName'),
-        basePriceMinor: search.get('basePriceMinor'),
-        format: search.get('format'),
-        subtitle: search.get('subtitle'),
-    }), [search]);
+
+    const searchParams = useSearchParams();
+    const showtimeParam = searchParams.get('showtime');
+    const showtime = showtimeParam ? JSON.parse(showtimeParam) : null;
+
     const {user, isAuthenticated} = useAuth();
     const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
     const [secondsLeft, setSecondsLeft] = useState<number>(5 * 60);
@@ -181,147 +169,74 @@ const SeatSelectionContent = () => {
 
     return (
         <div className="py-8 px-4 lg:px-8 min-h-screen">
+            {loading && <SeatSelectionSkeleton/>}
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left: Seat map */}
                 <div className="lg:col-span-2">
-                    {/* Movie Info Card */}
-                    <motion.div
-                        className="mb-8 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:shadow-2xl"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <div className="p-6">
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="flex items-start gap-4 min-w-0 flex-1">
-                                    <motion.div
-                                        className="hidden sm:block w-16 h-24 rounded-xl overflow-hidden bg-white/20 backdrop-blur-sm ring-2 ring-white/30 shrink-0"
-                                        whileHover={{ scale: 1.05 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <div className="w-full h-full flex items-center justify-center text-white font-bold text-2xl">
-                                            {showtime?.movieTitle?.[0] || 'M'}
-                                        </div>
-                                    </motion.div>
-                                    <div className="min-w-0 flex-1">
-                                        <motion.h1
-                                            className="text-xl lg:text-2xl font-bold text-white truncate mb-2"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2 }}
-                                        >
-                                            {showtime.movieTitle}
-                                        </motion.h1>
-                                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                                            {showtime?.format && (
-                                                <motion.span
-                                                    className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white ring-1 ring-white/30 text-sm font-medium"
-                                                    initial={{ opacity: 0, scale: 0.8 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{ delay: 0.3 }}
-                                                >
-                                                    {showtime.format}
-                                                </motion.span>
-                                            )}
-                                            {showtime?.subtitle && (
-                                                <motion.span
-                                                    className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white ring-1 ring-white/30 text-sm font-medium"
-                                                    initial={{ opacity: 0, scale: 0.8 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{ delay: 0.4 }}
-                                                >
-                                                    Phụ đề
-                                                </motion.span>
-                                            )}
-                                        </div>
-                                        <div className="text-white/90 text-sm">
-                                            <span className="font-medium">Thời gian:</span> {toDate(showtime.startUtc)?.toLocaleDateString('vi-VN', {
-                                            weekday: 'long',
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric'
-                                        })} • {toDate(showtime.startUtc)?.toLocaleTimeString('vi-VN', {
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })} - {toDate(showtime.endUtc)?.toLocaleTimeString('vi-VN', {
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                        </div>
-                                    </div>
-                                </div>
-                                <motion.div
-                                    className="shrink-0 flex flex-col items-end"
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.5 }}
-                                >
-                                    <div className="text-center">
-                                        <div className="text-xs text-white/80 mb-2 font-medium">Giữ chỗ còn</div>
-                                        <motion.div
-                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/20 backdrop-blur-sm ring-2 ring-white/30"
-                                            animate={{ scale: [1, 1.05, 1] }}
-                                            transition={{ duration: 2, repeat: Infinity }}
-                                        >
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                                 xmlns="http://www.w3.org/2000/svg" className="text-white">
-                                                <path d="M12 6v6l4 2" stroke="currentColor" strokeWidth="2"
-                                                      strokeLinecap="round" strokeLinejoin="round"/>
-                                                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-                                            </svg>
-                                            <span className="text-white font-bold text-xl tabular-nums">{minutes}:{seconds}</span>
-                                        </motion.div>
-                                    </div>
-                                </motion.div>
-                            </div>
+                    <div className="flex item-end justify-between gap-4">
+                        <div className="text-center">
+                            <div className="text-xs text-gray-800/80 font-medium">Giữ chỗ còn</div>
+                            <motion.div
+                                className="inline-flex items-center"
+                                animate={{scale: [1, 1.05, 1]}}
+                                transition={{duration: 2, repeat: Infinity}}
+                            >
+                                        <span
+                                            className="text-pink-500 font-bold text-xl tabular-nums">{minutes}:{seconds}</span>
+                            </motion.div>
                         </div>
-                    </motion.div>
+                    </div>
 
                     {!loading && error && (
                         <div className="text-accent-red mb-4">{error}</div>
                     )}
-                    {loading && <SeatSelectionSkeleton/>}
 
                     {/* Seat Selection Area */}
                     {!loading && !error && layout && (
                         <motion.div
-                            className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:shadow-2xl"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden"
+                            initial={{opacity: 0, y: 20}}
+                            animate={{opacity: 1, y: 0}}
+                            transition={{duration: 0.6, delay: 0.3}}
                         >
                             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                                 {/* Legend */}
                                 <div className="lg:col-span-1">
                                     <motion.div
                                         className="bg-gradient-to-br from-neutral-lightGray/10 to-neutral-lightGray/5 rounded-xl p-4 border border-neutral-lightGray/20"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.4 }}
+                                        initial={{opacity: 0, x: -20}}
+                                        animate={{opacity: 1, x: 0}}
+                                        transition={{delay: 0.4}}
                                     >
-                                        <div className="text-sm font-bold text-neutral-darkGray mb-4 flex items-center gap-2">
+                                        <div
+                                            className="text-sm font-bold text-neutral-darkGray mb-4 flex items-center gap-2">
                                             <span className="text-lg">🎫</span>
                                             Chú thích ghế
                                         </div>
                                         <div className="space-y-3 text-sm text-neutral-darkGray">
                                             <div className="flex items-center gap-3">
-                                                <span className="w-6 h-6 rounded-md bg-neutral-lightGray border border-neutral-lightGray/50 inline-block"/>
+                                                <span
+                                                    className="w-6 h-6 rounded-md bg-neutral-lightGray border border-neutral-lightGray/50 inline-block"/>
                                                 <span>Ghế có thể đặt</span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <span className="w-6 h-6 rounded-md bg-accent-yellow border border-accent-yellow/50 inline-block"/>
+                                                <span
+                                                    className="w-6 h-6 rounded-md bg-accent-yellow border border-accent-yellow/50 inline-block"/>
                                                 <span>Ghế đang chọn</span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <span className="w-6 h-6 rounded-md bg-green-500 border border-green-500/50 inline-block"/>
+                                                <span
+                                                    className="w-6 h-6 rounded-md bg-green-500 border border-green-500/50 inline-block"/>
                                                 <span>Ghế đang có người chọn</span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <span className="w-6 h-6 rounded-md bg-accent-red border border-accent-red/50 inline-block"/>
+                                                <span
+                                                    className="w-6 h-6 rounded-md bg-accent-red border border-accent-red/50 inline-block"/>
                                                 <span>Ghế đã có người đặt</span>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <span className="w-6 h-6 rounded-md bg-neutral-darkGray border border-neutral-darkGray/50 inline-block"/>
+                                                <span
+                                                    className="w-6 h-6 rounded-md bg-neutral-darkGray border border-neutral-darkGray/50 inline-block"/>
                                                 <span>Ghế không thể đặt</span>
                                             </div>
                                         </div>
@@ -334,22 +249,26 @@ const SeatSelectionContent = () => {
                                         <div className="max-w-full">
                                             {/* Screen */}
                                             <motion.div
-                                                className="mb-6 text-center"
-                                                initial={{ opacity: 0, y: -20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.5 }}
+                                                className="mb-2 text-center"
+                                                initial={{opacity: 0, y: -20}}
+                                                animate={{opacity: 1, y: 0}}
+                                                transition={{delay: 0.5}}
                                             >
                                                 <div className="relative">
-                                                    <div className="h-3 w-full bg-gradient-to-r from-neutral-lightGray to-neutral-lightGray/60 rounded-full shadow-lg"/>
-                                                    <div className="absolute inset-0 h-3 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full"/>
+                                                    <div
+                                                        className="h-3 w-full bg-gradient-to-r from-neutral-lightGray to-neutral-lightGray/60 rounded-full shadow-lg"/>
+                                                    <div
+                                                        className="absolute inset-0 h-3 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full"/>
                                                 </div>
                                                 <div className="mt-3 text-center">
-                                                    <span className="text-lg font-bold text-neutral-darkGray">🎬 MÀN HÌNH</span>
+                                                    <span
+                                                        className="text-lg font-bold text-neutral-darkGray">🎬 MÀN HÌNH</span>
                                                 </div>
                                             </motion.div>
 
                                             {/* Seat Grid */}
-                                            <div className="space-y-4 overflow-x-auto p-4 bg-gradient-to-br from-neutral-lightGray/5 to-neutral-lightGray/10 rounded-xl">
+                                            <div
+                                                className="space-y-4 overflow-x-auto p-4 bg-gradient-to-br from-neutral-lightGray/5 to-neutral-lightGray/10 rounded-xl">
                                                 {layout.rows.map((row, rowIndex) => {
                                                     const sorted = [...row.seats].sort((a, b) => (a.positionX ?? 0) - (b.positionX ?? 0));
                                                     const unit = 50;
@@ -359,11 +278,12 @@ const SeatSelectionContent = () => {
                                                         <motion.div
                                                             key={row.rowLabel}
                                                             className="flex items-center gap-3"
-                                                            initial={{ opacity: 0, x: -20 }}
-                                                            animate={{ opacity: 1, x: 0 }}
-                                                            transition={{ delay: 0.6 + rowIndex * 0.1 }}
+                                                            initial={{opacity: 0, x: -20}}
+                                                            animate={{opacity: 1, x: 0}}
+                                                            transition={{delay: 0.6 + rowIndex * 0.1}}
                                                         >
-                                                            <div className="w-8 text-sm font-bold text-neutral-darkGray text-right">
+                                                            <div
+                                                                className="w-8 text-sm font-bold text-neutral-darkGray text-right">
                                                                 {row.rowLabel}
                                                             </div>
                                                             <div className="flex flex-nowrap items-center gap-1">
@@ -375,7 +295,7 @@ const SeatSelectionContent = () => {
                                                                         parts.push(
                                                                             <div
                                                                                 key={`spacer-${row.rowLabel}-${cursorX}`}
-                                                                                style={{ width: spacerWidth, height: 0 }}
+                                                                                style={{width: spacerWidth, height: 0}}
                                                                             />
                                                                         );
                                                                         cursorX = startX;
@@ -402,10 +322,10 @@ const SeatSelectionContent = () => {
                                                                                 width,
                                                                                 borderColor: selected ? '#FACC15' : 'rgba(156, 163, 175, 0.3)'
                                                                             }}
-                                                                            whileHover={{ scale: 1.05 }}
-                                                                            whileTap={{ scale: 0.95 }}
-                                                                            animate={selected ? { scale: [1, 1.1, 1] } : {}}
-                                                                            transition={{ duration: 0.3 }}
+                                                                            whileHover={{scale: 1.05}}
+                                                                            whileTap={{scale: 0.95}}
+                                                                            animate={selected ? {scale: [1, 1.1, 1]} : {}}
+                                                                            transition={{duration: 0.3}}
                                                                         >
                                                                             {s.seatNumber}
                                                                         </motion.button>
@@ -428,12 +348,12 @@ const SeatSelectionContent = () => {
                 </div>
 
                 {/* Right: Booking summary */}
-                <div className="lg:sticky lg:top-4 h-fit">
+                <div className="lg:sticky h-fit">
                     <motion.div
                         className="rounded-2xl bg-white/95 backdrop-blur-sm shadow-2xl border border-white/20 overflow-hidden"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
+                        initial={{opacity: 0, x: 20}}
+                        animate={{opacity: 1, x: 0}}
+                        transition={{duration: 0.6, delay: 0.4}}
                     >
                         {/* Header */}
                         <div className="bg-primary-pink px-6 py-5">
@@ -441,8 +361,8 @@ const SeatSelectionContent = () => {
                                 <div className="flex items-center gap-3 text-white">
                                     <motion.div
                                         className="p-2 bg-white/20 backdrop-blur-sm rounded-lg"
-                                        animate={{ rotate: [0, 5, -5, 0] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
+                                        animate={{rotate: [0, 5, -5, 0]}}
+                                        transition={{duration: 2, repeat: Infinity}}
                                     >
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
@@ -455,8 +375,8 @@ const SeatSelectionContent = () => {
                                 </div>
                                 <motion.span
                                     className="text-white/90 text-2xl"
-                                    animate={{ scale: [1, 1.1, 1] }}
-                                    transition={{ duration: 2, repeat: Infinity }}
+                                    animate={{scale: [1, 1.1, 1]}}
+                                    transition={{duration: 2, repeat: Infinity}}
                                 >
                                     🎟️
                                 </motion.span>
@@ -480,9 +400,8 @@ const SeatSelectionContent = () => {
 
                             <div className="space-y-4 text-neutral-darkGray">
                                 <div>
-                                    <div className="text-xs uppercase tracking-wide text-neutral-darkGray/70">Phim</div>
-                                    <div
-                                        className="mt-1 text-lg lg:text-xl font-bold truncate">{showtime.movieTitle}</div>
+                                    <p
+                                        className="mt-1 text-pink-500 text-sm lg:text-lg font-bold italic">{showtime.movieTitle}</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-3 text-sm">
@@ -589,34 +508,24 @@ const SeatSelectionContent = () => {
                             <motion.button
                                 type="button"
                                 disabled={selectedSeatIds.length === 0}
-                                className={`w-full inline-flex items-center justify-center gap-3 py-4 rounded-xl text-white font-bold text-lg transition-all duration-300 shadow-lg ${
-                                    selectedSeatIds.length === 0 
-                                        ? 'bg-neutral-lightGray cursor-not-allowed opacity-50' 
-                                        : 'bg-primary-pink hover:shadow-2xl hover:scale-105'
+                                className={`w-full inline-flex items-center justify-center py-3 rounded-xl text-white font-bold text-sm transition-all duration-300 ${
+                                    selectedSeatIds.length === 0
+                                        ? 'bg-neutral-lightGray cursor-not-allowed opacity-50'
+                                        : 'bg-primary-pink hover:shadow-2xl cursor-pointer'
                                 }`}
-                                whileHover={selectedSeatIds.length > 0 ? { scale: 1.02 } : {}}
-                                whileTap={selectedSeatIds.length > 0 ? { scale: 0.98 } : {}}
-                                animate={selectedSeatIds.length > 0 ? { boxShadow: ["0 10px 25px rgba(236, 72, 153, 0.3)", "0 15px 35px rgba(236, 72, 153, 0.4)", "0 10px 25px rgba(236, 72, 153, 0.3)"] } : {}}
-                                transition={{ duration: 2, repeat: Infinity }}
+                                whileTap={selectedSeatIds.length > 0 ? {scale: 0.98} : {}}
+                                animate={selectedSeatIds.length > 0 ? {boxShadow: ["0 10px 25px rgba(236, 72, 153, 0.3)", "0 15px 35px rgba(236, 72, 153, 0.4)", "0 10px 25px rgba(236, 72, 153, 0.3)"]} : {}}
+                                transition={{duration: 2, repeat: Infinity}}
                             >
                                 <span>ĐẶT VÉ NGAY</span>
-                                <motion.svg
-                                    width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    animate={selectedSeatIds.length > 0 ? { x: [0, 3, 0] } : {}}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                >
-                                    <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2"
-                                          strokeLinecap="round" strokeLinejoin="round"/>
-                                </motion.svg>
                             </motion.button>
-                            
+
                             {selectedSeatIds.length > 0 && (
                                 <motion.div
                                     className="mt-3 text-center"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.2 }}
+                                    initial={{opacity: 0, y: 10}}
+                                    animate={{opacity: 1, y: 0}}
+                                    transition={{delay: 0.2}}
                                 >
                                     <p className="text-xs text-neutral-darkGray/70">
                                         💡 Bạn có {selectedSeatIds.length} ghế đã chọn
@@ -633,8 +542,8 @@ const SeatSelectionContent = () => {
 
 const SeatSelectionPage = () => {
     return (
-        <Suspense fallback={<SeatSelectionSkeleton />}>
-            <SeatSelectionContent />
+        <Suspense fallback={<SeatSelectionSkeleton/>}>
+            <SeatSelectionContent/>
         </Suspense>
     );
 };
