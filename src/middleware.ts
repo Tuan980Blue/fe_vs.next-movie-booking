@@ -17,12 +17,12 @@ export function middleware(request: NextRequest) {
 
     const isPublic = publicRoutes.some((route) => pathname === route)
 
-    if (!refreshToken && !isPublic) {
-        // Gắn url cũ cho url mới để sau này callback
-        const redirectUrl = `/auth?callbackUrl=${encodeURIComponent(pathname)}`
-
-        return NextResponse.redirect(new URL(redirectUrl, request.url))
-    }
+    // if (!refreshToken && !isPublic) {
+    //     // Gắn url cũ cho url mới để sau này callback
+    //     const redirectUrl = `/auth?callbackUrl=${encodeURIComponent(pathname)}`
+    //
+    //     return NextResponse.redirect(new URL(redirectUrl, request.url))
+    // }
 
     // Cho phép đi tiếp
     return NextResponse.next();
