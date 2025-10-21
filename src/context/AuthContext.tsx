@@ -26,11 +26,11 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
     // Initialize auth state on mount
     useEffect(() => {
         // //Check login flag
-        const hasLoggedInFlag = document.cookie.includes('logged_in=true'); //có chứa đoạn văn bản
-        if (!hasLoggedInFlag) {
-            setIsLoading(false);
-            return;
-        }
+        // const hasLoggedInFlag = document.cookie.includes('logged_in=true');
+        // if (!hasLoggedInFlag) {
+        //     setIsLoading(false);
+        //     return;
+        // }
 
         const initializeAuth = async () => {
             try {
