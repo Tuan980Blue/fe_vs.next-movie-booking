@@ -1,6 +1,10 @@
 "use client";
 
 import {useAuth} from "@/context/AuthContext";
+import type { Metadata } from "next";
+
+// Note: Since this is a client component, we can't export metadata here
+// We'll need to create a separate layout or move metadata to a parent component
 
 export default function AdminDashboard() {
     const {user} = useAuth();
