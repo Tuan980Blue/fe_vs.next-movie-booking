@@ -77,7 +77,7 @@ export default function MovieForm({ movie, onSubmit, onCancel, loading = false }
       newErrors.durationMinutes = 'Duration must be greater than 0';
     }
 
-    if (formData.genreIds.length === 0) {
+    if (!formData.genreIds || formData.genreIds.length === 0) {
       newErrors.genreIds = 'At least one genre is required';
     }
 
@@ -124,9 +124,9 @@ export default function MovieForm({ movie, onSubmit, onCancel, loading = false }
   const handleGenreToggle = (genreId: string) => {
     setFormData(prev => ({
       ...prev,
-      genreIds: prev.genreIds.includes(genreId)
-        ? prev.genreIds.filter(id => id !== genreId)
-        : [...prev.genreIds, genreId]
+      genreIds: (prev.genreIds || []).includes(genreId)
+        ? (prev.genreIds || []).filter(id => id !== genreId)
+        : [...(prev.genreIds || []), genreId]
     }));
   };
 
@@ -339,7 +339,7 @@ export default function MovieForm({ movie, onSubmit, onCancel, loading = false }
             <label key={genre.id} className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={formData.genreIds.includes(genre.id)}
+                checked={(formData.genreIds || []).includes(genre.id)}
                 onChange={() => handleGenreToggle(genre.id)}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
