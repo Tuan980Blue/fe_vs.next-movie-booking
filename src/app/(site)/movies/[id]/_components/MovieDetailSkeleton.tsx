@@ -1,7 +1,7 @@
 
 const MovieDetailSkeleton = () => {
   return (
-    <div className="min-h-screen bg-gray-800">
+    <div className="min-h-screen mb-8 lg:mb-16">
       {/* Hero Section Skeleton */}
       <div className="relative h-[85vh] lg:h-[90vh] overflow-hidden">
         {/* Backdrop Skeleton */}
@@ -31,8 +31,8 @@ const MovieDetailSkeleton = () => {
               <div className="xl:col-span-8 text-white relative">
                 {/* Title Section Skeleton */}
                 <div className="mb-4">
-                  <div className="h-8 lg:h-10 xl:h-12 bg-white/20 rounded-lg animate-pulse mb-2" />
-                  <div className="h-6 lg:h-7 bg-white/15 rounded-lg animate-pulse w-3/4" />
+                  <div className="h-8 lg:h-10 xl:h-12 bg-white/20 rounded-lg animate-pulse mb-2 w-3/4" />
+                  <div className="h-6 lg:h-7 bg-white/15 rounded-lg animate-pulse w-1/2" />
                 </div>
 
                 {/* Status Badge Skeleton */}
@@ -52,7 +52,7 @@ const MovieDetailSkeleton = () => {
 
                 {/* Action Buttons Skeleton */}
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="h-12 w-40 bg-white/20 rounded-2xl animate-pulse" />
+                  <div className="h-12 w-40 bg-primary-pink/30 rounded-2xl animate-pulse" />
                   <div className="h-12 w-36 bg-white/20 rounded-2xl animate-pulse" />
                 </div>
               </div>
@@ -114,15 +114,22 @@ const MovieDetailSkeleton = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Showtimes Skeleton */}
           <div className="lg:col-span-2">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
-              <div className="h-6 w-32 bg-white/20 rounded animate-pulse mb-4" />
+            <div className="border border-white/20 text-white rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center mb-6">
+                <div className="mr-4 h-px bg-primary-pink/30 flex-1"></div>
+                <div className="h-6 w-32 bg-white/20 rounded animate-pulse"></div>
+                <div className="ml-4 h-px bg-primary-pink/30 flex-1"></div>
+              </div>
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={index} className="bg-white/5 rounded-lg p-4">
-                    <div className="h-5 w-24 bg-white/20 rounded animate-pulse mb-2" />
-                    <div className="grid grid-cols-4 gap-2">
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="h-8 bg-white/15 rounded animate-pulse" />
+                  <div key={index} className="mb-8">
+                    <div className="relative inline-block mb-4">
+                      <div className="bg-primary-purple/30 text-white px-5 py-2 rounded-xl animate-pulse h-8 w-40"></div>
+                      <span className="absolute -bottom-2 left-6 w-3 h-3 bg-primary-purple/30 rotate-45 rounded-[2px]"></span>
+                    </div>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2 sm:gap-5">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="h-10 bg-white/15 rounded-lg animate-pulse" />
                       ))}
                     </div>
                   </div>

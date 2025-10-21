@@ -58,25 +58,25 @@ const BookingCompletePage = () => {
             <div className="max-w-4xl mx-auto">
                 {/* Success Animation */}
                 <motion.div
-                    className="text-center mb-12"
+                    className="text-center mb-6"
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     <motion.div
-                        className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-r from-green-400 to-green-600 rounded-full mb-8 shadow-2xl"
-                        animate={{ 
+                        className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full mb-2 shadow-xl"
+                        animate={{
                             scale: [1, 1.1, 1],
                             boxShadow: [
                                 "0 0 0 0 rgba(34, 197, 94, 0.7)",
-                                "0 0 0 20px rgba(34, 197, 94, 0)",
+                                "0 0 0 10px rgba(34, 197, 94, 0)",
                                 "0 0 0 0 rgba(34, 197, 94, 0)"
                             ]
                         }}
                         transition={{ duration: 2, repeat: Infinity }}
                     >
                         <motion.span
-                            className="text-6xl"
+                            className="text-3xl"
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.3, duration: 0.5 }}
@@ -84,18 +84,16 @@ const BookingCompletePage = () => {
                             ✅
                         </motion.span>
                     </motion.div>
-                    
                     <motion.h1
-                        className="text-5xl font-bold text-white mb-4 drop-shadow-lg"
+                        className="text-xl font-bold text-gray-700 mb-2 drop-shadow-lg"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                     >
                         Đặt vé thành công!
                     </motion.h1>
-                    
                     <motion.p
-                        className="text-white/80 text-xl max-w-2xl mx-auto"
+                        className="text-pink-500 text-sm max-w-2xl mx-auto"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
@@ -112,7 +110,7 @@ const BookingCompletePage = () => {
                     transition={{ delay: 0.9, duration: 0.6 }}
                 >
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-primary-pink via-accent-orange to-accent-yellow px-8 py-6">
+                    <div className="bg-primary-pink px-8 py-6">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3 text-white">
                                 <span className="text-2xl">🎫</span>
@@ -198,8 +196,7 @@ const BookingCompletePage = () => {
                 >
                     <Link href="/user/my-bookings">
                         <motion.button
-                            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-primary-pink to-accent-orange text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
+                            className="w-full sm:w-auto px-8 py-4 bg-primary-pink text-white font-bold text-lg rounded-xl cursor-pointer transition-all duration-300"
                             whileTap={{ scale: 0.95 }}
                         >
                             Xem vé của tôi
@@ -208,8 +205,7 @@ const BookingCompletePage = () => {
                     
                     <Link href="/">
                         <motion.button
-                            className="w-full sm:w-auto px-8 py-4 bg-white/20 backdrop-blur-sm text-white font-bold text-lg rounded-xl border-2 border-white/30 hover:bg-white/30 transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
+                            className="w-full sm:w-auto px-8 py-4 bg-white backdrop-blur-sm text-gray-400 font-bold text-lg rounded-xl cursor-pointer border-2 border-white/30 transition-all duration-300"
                             whileTap={{ scale: 0.95 }}
                         >
                             Về trang chủ
@@ -219,14 +215,14 @@ const BookingCompletePage = () => {
 
                 {/* Additional Info */}
                 <motion.div
-                    className="text-center mt-12"
+                    className="text-center mt-2"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.5 }}
                 >
                     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h3 className="text-white font-semibold mb-3">📧 Thông tin quan trọng</h3>
-                        <div className="text-white/80 text-sm space-y-2">
+                        <h3 className="text-pink-400 font-semibold mb-3">📧 Thông tin quan trọng</h3>
+                        <div className="text-gray-600 text-sm space-y-2">
                             <p>• Vé điện tử đã được gửi về email của bạn</p>
                             <p>• Vui lòng đến rạp trước 15 phút để làm thủ tục</p>
                             <p>• Mang theo CMND/CCCD để xác thực khi lấy vé</p>

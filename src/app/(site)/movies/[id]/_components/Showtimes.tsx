@@ -107,10 +107,7 @@ const Showtimes = ({ movieId }: { movieId: string }) => {
                                     key={`filled-${item.id}`}
                                     onClick={() => {
                                         const params = new URLSearchParams({
-                                            showtimeId: String(item.id || ''),
-                                            cinemaId: String((item as any).cinemaId || item.room?.cinema?.id || ''),
-                                            roomId: String((item as any).roomId || ''),
-                                            startUtc: String(item.startUtc || ''),
+                                            showtime: JSON.stringify(item)
                                         });
                                         router.push(`/booking/seat-selection?${params.toString()}`);
                                     }}
