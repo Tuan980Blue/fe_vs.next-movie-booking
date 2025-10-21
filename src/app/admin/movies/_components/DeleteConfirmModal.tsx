@@ -59,7 +59,7 @@ export default function DeleteConfirmModal({
                     </Dialog.Title>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to delete <strong>"{movie.title}"</strong>? 
+                        Are you sure you want to delete <strong>{movie.title}</strong>?
                         This action cannot be undone and will permanently remove the movie from the system.
                       </p>
                     </div>
