@@ -1,16 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { AdminOnly } from "@/context/RoleGuard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import SidebarAdmin from "@/app/admin/_components/SidebarAdmin";
+import AdminSkeleton from "@/app/admin/_components/AdminSkeleton";
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
     const { user, isAuthenticated, isLoading } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!isLoading && (!isAuthenticated || !user)) {
@@ -25,14 +28,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     }, [isAuthenticated, user, isLoading, pathname, router]);
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-pink mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Đang tải...</p>
-                </div>
-            </div>
-        );
+        return <AdminSkeleton />;
     }
 
     if (!isAuthenticated || !user) {
@@ -43,12 +39,6 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         return null;
     }
 
-    const navItems = [
-        { href: "/admin", label: "Dashboard", icon: "📊" },
-        { href: "/admin/movies", label: "Quản lý phim", icon: "🎬" },
-        { href: "/admin/users", label: "Quản lý người dùng", icon: "👥" },
-    ];
-
     return (
         <AdminOnly fallback={
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -58,60 +48,32 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
                 </div>
             </div>
         }>
-            <div className="flex min-h-screen bg-gray-50">
+            <div className="flex h-screen bg-gray-50 overflow-hidden">
                 {/* Sidebar */}
-                <aside className="w-64 bg-gray-800 text-white shadow-lg">
-                    <div className="p-6">
-                        <h2 className="text-xl font-bold mb-6 flex items-center">
-                            <span className="mr-2">🎭</span>
-                            Admin Panel
-                        </h2>
-                        <nav className="space-y-2">
-                            {navItems.map((item) => {
-                                const isActive = pathname === item.href || 
-                                    (item.href !== "/admin" && pathname.startsWith(item.href));
-                                return (
-                                    <Link
-                                        key={item.href}
-                                        href={item.href}
-                                        className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                                            isActive
-                                                ? 'bg-primary-pink text-white'
-                                                : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                                        }`}
-                                    >
-                                        <span className="text-lg">{item.icon}</span>
-                                        <span className="font-medium">{item.label}</span>
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
-                    
-                    {/* User Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
-                        <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-primary-pink rounded-full flex items-center justify-center">
-                                <span className="text-white text-sm font-bold">
-                                    {user.fullName?.charAt(0) || user.email?.charAt(0) || 'A'}
-                                </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-white truncate">
-                                    {user.fullName || 'Admin'}
-                                </p>
-                                <p className="text-xs text-gray-400 truncate">
-                                    {user.email}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
+                <SidebarAdmin 
+                    isOpen={sidebarOpen} 
+                    onClose={() => setSidebarOpen(false)} 
+                />
 
                 {/* Main Content */}
-                <main className="flex-1 overflow-auto">
-                    <div className="p-6">
-                        {children}
+                <main className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+                    {/* Mobile Header */}
+                    <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                            <Bars3Icon className="h-6 w-6" />
+                        </button>
+                        <h1 className="text-lg font-semibold text-gray-900">Admin Panel</h1>
+                        <div className="w-10"></div> {/* Spacer for centering */}
+                    </div>
+
+                    {/* Scrollable Content */}
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="p-6">
+                            {children}
+                        </div>
                     </div>
                 </main>
             </div>

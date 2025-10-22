@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ManageUsers = () => {
+const MovieCard = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const ManageUsers = () => {
     );
 };
 
-export default ManageUsers;
+export default MovieCard;

@@ -103,7 +103,7 @@ export interface MovieResponse {
 export interface GenreResponse {
   id: string;
   name: string;
-  movieCount?: number;
+  movieCount: number;
 }
 
 export interface MovieListResponse {
