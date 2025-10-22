@@ -7,9 +7,8 @@ import {
   UpdateMovieRequest, 
   MovieResponse, 
   MovieStatus,
-  GenreResponse 
 } from '@/models/movie';
-import { fetchGenres } from '@/store/slices/moviesSlice';
+import {fetchGenres} from "@/store/slices/genresSlice";
 
 interface MovieFormProps {
   movie?: MovieResponse | null;
@@ -20,7 +19,7 @@ interface MovieFormProps {
 
 export default function MovieForm({ movie, onSubmit, onCancel, loading = false }: MovieFormProps) {
   const dispatch = useAppDispatch();
-  const { genres } = useAppSelector((state) => state.movies);
+  const { items: genres } = useAppSelector((state) => state.genres);
   
   const [formData, setFormData] = useState<CreateMovieRequest>({
     title: '',

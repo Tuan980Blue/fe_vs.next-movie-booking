@@ -98,7 +98,8 @@ export default function SidebarAdmin({ isOpen, onClose }: SidebarAdminProps) {
     if (href === "/admin") {
       return pathname === href;
     }
-    return pathname.startsWith(href);
+    // Use exact match for all routes to prevent parent/child conflicts
+    return pathname === href;
   };
 
   const isParentActive = (item: MenuItem) => {
