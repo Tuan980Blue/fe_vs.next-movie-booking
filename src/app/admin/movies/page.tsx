@@ -51,7 +51,6 @@ export default function ManageMovies() {
         sort: 'createdAt',
         order: 'desc'
     });
-    const [showFilters, setShowFilters] = useState(false);
 
     // Load initial data
     useEffect(() => {
@@ -206,10 +205,10 @@ export default function ManageMovies() {
                 </div>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary-pink text-white rounded-lg hover:bg-primary-pink/90 transition-colors"
                 >
-                    <PlusIcon className="h-5 w-5 mr-2"/>
-                    Add Movie
+                    <PlusIcon className="h-5 w-5"/>
+                    Thêm phim mới
                 </button>
             </div>
 

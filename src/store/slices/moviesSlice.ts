@@ -5,8 +5,7 @@ import {
   MovieSearchParams, 
   CreateMovieRequest, 
   UpdateMovieRequest,
-  MovieStatus,
-  GenreResponse
+  MovieStatus
 } from '@/models/movie'
 import { 
   getMoviesApi, 
@@ -16,7 +15,6 @@ import {
   changeMovieStatusApi,
   getMovieStatsApi
 } from '@/service/services/movieService'
-import { getGenresApi } from '@/service/services/genreService'
 
 export interface MoviesState {
     items: MovieResponse[]
@@ -27,7 +25,6 @@ export interface MoviesState {
     loading: boolean
     error: string | null
     lastQuery: MovieSearchParams | null  //Lưu lại bộ lọc cuối cùng (vd: thể loại, tên phim, trang, etc.), sau này refresh truyền vào.
-    genres: GenreResponse[]
     stats: {
         totalMovies: number
         draftMovies: number
@@ -47,7 +44,6 @@ const initialState: MoviesState = {
     loading: false,
     error: null,
     lastQuery: null,
-    genres: [],
     stats: null,
     selectedMovie: null,
 }
@@ -178,21 +174,6 @@ export const fetchMovieStats = createAsyncThunk<any, void>(
     }
 )
 
-/**
- * Get all genres
- */
-export const fetchGenres = createAsyncThunk<GenreResponse[], void>(
-    'movies/fetchGenres',
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await getGenresApi()
-            return response
-        } catch (err: any) {
-            const message = err?.response?.data?.message || err?.message || 'Failed to fetch genres'
-            return rejectWithValue(message) as any
-        }
-    }
-)
 
 //Gom reducer + action vào một “slice” duy nhất
 const moviesSlice = createSlice({
@@ -328,19 +309,6 @@ const moviesSlice = createSlice({
                 state.error = (action.payload as string) || action.error.message || 'Failed to fetch movie stats'
             })
             
-            // Fetch Genres
-            .addCase(fetchGenres.pending, (state) => {
-                state.loading = true
-                state.error = null
-            })
-            .addCase(fetchGenres.fulfilled, (state, action) => {
-                state.loading = false
-                state.genres = action.payload
-            })
-            .addCase(fetchGenres.rejected, (state, action) => {
-                state.loading = false
-                state.error = (action.payload as string) || action.error.message || 'Failed to fetch genres'
-            })
     }
 })
 

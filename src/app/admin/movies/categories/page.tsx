@@ -1,44 +1,34 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store/reduxhooks';
 import { GenreResponse, CreateGenreRequest, UpdateGenreRequest } from '@/models/movie';
 import { 
-  getGenresApi, 
-  createGenreApi, 
-  updateGenreApi, 
-  deleteGenreApi 
-} from '@/service/services/genreService';
+  fetchGenres, 
+  createGenre, 
+  updateGenre, 
+  deleteGenre,
+  setSearchKeyword,
+  setSelectedGenre,
+  clearError
+} from '@/store/slices/genresSlice';
 import { PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import GenreForm from "@/app/admin/movies/categories/_components/GenreForm";
+import DeleteConfirmModal from "@/app/admin/movies/categories/_components/DeleteConfirmModal";
 
 export default function ManageGenres() {
-  const [genres, setGenres] = useState<GenreResponse[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const dispatch = useAppDispatch();
+  const { items: genres, loading, error, searchKeyword, selectedGenre } = useAppSelector((state) => state.genres);
+  
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedGenre, setSelectedGenre] = useState<GenreResponse | null>(null);
   const [genreToDelete, setGenreToDelete] = useState<GenreResponse | null>(null);
 
-  // Load genres
-  const loadGenres = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await getGenresApi();
-      setGenres(data);
-    } catch (err) {
-      setError('Failed to load genres');
-      console.error('Error loading genres:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Load genres on component mount
   useEffect(() => {
-    loadGenres();
-  }, []);
+    dispatch(fetchGenres());
+  }, [dispatch]);
 
   // Filter genres based on search
   const filteredGenres = genres.filter(genre =>
@@ -48,15 +38,10 @@ export default function ManageGenres() {
   // Handle create genre
   const handleCreateGenre = async (data: CreateGenreRequest) => {
     try {
-      setLoading(true);
-      await createGenreApi(data);
+      await dispatch(createGenre(data)).unwrap();
       setShowCreateModal(false);
-      await loadGenres(); // Reload genres
     } catch (err) {
-      setError('Failed to create genre');
       console.error('Error creating genre:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -65,16 +50,11 @@ export default function ManageGenres() {
     if (!selectedGenre) return;
 
     try {
-      setLoading(true);
-      await updateGenreApi(selectedGenre.id, data);
+      await dispatch(updateGenre({ id: selectedGenre.id, data })).unwrap();
       setShowEditModal(false);
-      setSelectedGenre(null);
-      await loadGenres(); // Reload genres
+      dispatch(setSelectedGenre(null));
     } catch (err) {
-      setError('Failed to update genre');
       console.error('Error updating genre:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -83,22 +63,17 @@ export default function ManageGenres() {
     if (!genreToDelete) return;
 
     try {
-      setLoading(true);
-      await deleteGenreApi(genreToDelete.id);
+      await dispatch(deleteGenre(genreToDelete.id)).unwrap();
       setShowDeleteModal(false);
       setGenreToDelete(null);
-      await loadGenres(); // Reload genres
     } catch (err) {
-      setError('Failed to delete genre');
       console.error('Error deleting genre:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
   // Handle edit click
   const handleEditClick = (genre: GenreResponse) => {
-    setSelectedGenre(genre);
+    dispatch(setSelectedGenre(genre));
     setShowEditModal(true);
   };
 
@@ -106,6 +81,16 @@ export default function ManageGenres() {
   const handleDeleteClick = (genre: GenreResponse) => {
     setGenreToDelete(genre);
     setShowDeleteModal(true);
+  };
+
+  // Handle search change
+  const handleSearchChange = (value: string) => {
+    dispatch(setSearchKeyword(value));
+  };
+
+  // Handle error dismiss
+  const handleErrorDismiss = () => {
+    dispatch(clearError());
   };
 
   return (
@@ -183,7 +168,7 @@ export default function ManageGenres() {
               type="text"
               placeholder="Tìm kiếm thể loại..."
               value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-pink focus:border-transparent"
             />
           </div>
@@ -201,6 +186,16 @@ export default function ManageGenres() {
             </div>
             <div className="ml-3">
               <p className="text-sm text-red-800">{error}</p>
+            </div>
+            <div className="ml-auto pl-3">
+              <button
+                onClick={handleErrorDismiss}
+                className="text-red-400 hover:text-red-600"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -306,7 +301,7 @@ export default function ManageGenres() {
           onSubmit={handleUpdateGenre}
           onCancel={() => {
             setShowEditModal(false);
-            setSelectedGenre(null);
+            dispatch(setSelectedGenre(null));
           }}
           loading={loading}
         />
@@ -325,132 +320,6 @@ export default function ManageGenres() {
           loading={loading}
         />
       )}
-    </div>
-  );
-}
-
-// Genre Form Component
-interface GenreFormProps {
-  genre?: GenreResponse | null;
-  onSubmit: (data: CreateGenreRequest | UpdateGenreRequest) => void;
-  onCancel: () => void;
-  loading?: boolean;
-}
-
-function GenreForm({ genre, onSubmit, onCancel, loading = false }: GenreFormProps) {
-  const [formData, setFormData] = useState({
-    name: genre?.name || '',
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Tên thể loại là bắt buộc';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Tên thể loại phải có ít nhất 2 ký tự';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      onSubmit(formData);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
-            {genre ? 'Chỉnh sửa thể loại' : 'Thêm thể loại mới'}
-          </h3>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="px-6 py-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tên thể loại *
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-pink ${
-                errors.name ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder="Nhập tên thể loại..."
-              disabled={loading}
-            />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-          </div>
-
-          <div className="flex justify-end space-x-4 pt-6 border-t mt-6">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              disabled={loading}
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 text-white bg-primary-pink rounded-md hover:bg-primary-pink/90 focus:outline-none focus:ring-2 focus:ring-primary-pink disabled:opacity-50"
-            >
-              {loading ? 'Đang lưu...' : genre ? 'Cập nhật' : 'Tạo mới'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// Delete Confirmation Modal Component
-interface DeleteConfirmModalProps {
-  title: string;
-  message: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  loading?: boolean;
-}
-
-function DeleteConfirmModal({ title, message, onConfirm, onCancel, loading = false }: DeleteConfirmModalProps) {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-        </div>
-        
-        <div className="px-6 py-4">
-          <p className="text-gray-600">{message}</p>
-        </div>
-
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-4">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            disabled={loading}
-          >
-            Hủy
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
-          >
-            {loading ? 'Đang xóa...' : 'Xóa'}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
