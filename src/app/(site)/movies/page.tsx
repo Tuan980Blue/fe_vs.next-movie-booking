@@ -3,9 +3,8 @@
 import {useEffect, useMemo, useState} from "react";
 import MoviePageSkeleton from "@/app/(site)/movies/_components/MoviePageSkeleton";
 import {getMoviesApi} from "@/service";
-import Link from "next/link";
 import { MovieStatus, type MovieResponse, type MovieListResponse, type MovieSearchParams } from "@/models/movie";
-import type { Metadata } from "next";
+import MovieCard from "@/components/ui/MovieCard";
 
 // Note: Since this is a client component, we can't export metadata here
 // We'll need to create a separate metadata file or move metadata to a parent layout
@@ -13,7 +12,7 @@ import type { Metadata } from "next";
 const MoviesPage = () => {
     const [movies, setMovies] = useState<MovieResponse[]>([]);
     const [page, setPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
+    const [pageSize, setPageSize] = useState<number>(15);
     const [totalItems, setTotalItems] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
@@ -171,78 +170,7 @@ const MoviesPage = () => {
                     {!isLoading && !error && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
                             {movies.map((m) => (
-                                <div
-                                    key={m.id}
-                                    className="group rounded-2xl overflow-hidden bg-white border border-neutral-lightGray/70 shadow-sm hover:shadow-xl transition-all duration-300"
-                                >
-                                    <div className="relative aspect-[2/3] bg-neutral-lightGray/30 overflow-hidden">
-                                        {m.posterUrl ? (
-                                            <img
-                                                src={m.posterUrl}
-                                                alt={m.title}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-neutral-darkGray">No image</div>
-                                        )}
-                                        {m.rated && (
-                                            <div className="absolute top-3 right-3 text-[11px] tracking-wide bg-black/70 text-white rounded px-2 py-0.5">
-                                                {m.rated}
-                                            </div>
-                                        )}
-
-                                        {/* Hover overlay */}
-                                        <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <div className="absolute inset-0 p-4 flex flex-col items-center justify-center text-white">
-                                                <div className="w-full max-w-[210px] space-y-3">
-                                                    <div className="w-full max-w-[200px] space-y-2.5">
-                                                        <Link href={`/movies/${m.id}`} className="block w-full text-center text-sm font-extrabold tracking-wide bg-gray-50 hover:bg-gray-300 text-pink-500 rounded-md py-2">CHI TIẾT</Link>
-                                                        <Link href={`/movies/${m.id}`} className="block w-full text-center text-sm font-extrabold tracking-wide bg-pink-500 text-white hover:bg-cinema-neonPink rounded-md py-2">MUA VÉ</Link>
-                                                    </div>
-                                                    <div className="mt-3 text-left space-y-1 text-[13px] md:text-sm">
-                                                        {m.durationMinutes ? (
-                                                            <div><span className="font-bold">Thời lượng:</span> {m.durationMinutes} phút</div>
-                                                        ) : null}
-                                                        {Array.isArray(m.genres) && m.genres.length > 0 ? (
-                                                            <div>
-                                                                <div className="font-bold mb-1">Thể loại:</div>
-                                                                <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
-                                                                    {m.genres.map((g) => (
-                                                                        <div key={g.id} className="text-white/90">{g.name}</div>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        ) : null}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="p-4">
-                                        <h3 className="text-base md:text-lg font-bold text-neutral-darkGray mb-1 line-clamp-2 uppercase">
-                                            {m.title}
-                                        </h3>
-                                        <div className="text-sm text-neutral-darkGray/70 mb-2 line-clamp-2">{m.originalTitle}</div>
-                                        <div className="text-sm text-neutral-darkGray/70 mb-2">
-                                            {m.durationMinutes ? `${m.durationMinutes} phút` : ''}
-                                            {m.status ? ` • ${m.status}` : ''}
-                                        </div>
-                                        {m.releaseDate && (
-                                            <div className="text-sm font-medium text-[#a74bd6] mb-2">
-                                                Khởi chiếu {new Date(m.releaseDate).toLocaleDateString()}
-                                            </div>
-                                        )}
-                                        {Array.isArray(m.genres) && m.genres.length > 0 && (
-                                            <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
-                                                {m.genres.map((g) => (
-                                                    <div key={g.id} className="text-xs bg-neutral-lightGray/50 text-neutral-darkGray rounded px-2 py-0.5 w-fit">
-                                                        {g.name}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                <MovieCard key={m.id} movie={m} />
                             ))}
                         </div>
                     )}
