@@ -8,6 +8,7 @@ import Link from "next/link";
 import MoviesShowcaseSkeleton from "@/app/(site)/_components/MoviesShowcaseSkeleton";
 import {getMoviesApi} from "@/service";
 import { MovieStatus, type MovieResponse, type MovieSearchParams } from "@/models/movie";
+import MovieCard from "@/components/ui/MovieCard";
 
 interface TabButtonProps {
     active: boolean;
@@ -38,11 +39,9 @@ const MoviesShowcase: React.FC = () => {
     const [error, setError] = useState<string>('');
     const [startIndex, setStartIndex] = useState<number>(0); // sliding window start
 
-    const fetchSize = 12; // fetch a batch to slide through
-
     const params = useMemo<MovieSearchParams>(() => {
         const status = tab === 'NowShowing' ? MovieStatus.NowShowing : MovieStatus.ComingSoon;
-        return { page: 1, pageSize: fetchSize, status };
+        return { status };
     }, [tab]);
 
     useEffect(() => {
@@ -117,32 +116,7 @@ const MoviesShowcase: React.FC = () => {
                             {Array.from({ length: Math.min(4, items.length) }).map((_, idx) => {
                                 const m = items[(startIndex + idx) % items.length];
                                 return (
-                                    <div key={m.id} className="group rounded-2xl overflow-hidden bg-white border border-neutral-lightGray/70 shadow-sm hover:shadow-xl transition-all duration-300">
-                                        <div className="relative aspect-[2/3] bg-neutral-lightGray/30 overflow-hidden">
-                                            {m.posterUrl ? (
-                                                <img src={m.posterUrl} alt={m.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-neutral-darkGray">No image</div>
-                                            )}
-                                            {m.rated && (
-                                                <div className="absolute top-3 right-3 text-[11px] tracking-wide bg-black/70 text-white rounded px-2 py-0.5">{m.rated}</div>
-                                            )}
-                                            <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                <div className="absolute inset-0 p-3 flex flex-col items-center justify-center text-white">
-                                                    <div className="w-full max-w-[200px] space-y-2.5">
-                                                        <Link href={`/movies/${m.id}`} className="block w-full text-center text-sm font-extrabold tracking-wide bg-gray-50 hover:bg-gray-300 text-pink-500 rounded-md py-2">&gt; CHI TIẾT</Link>
-                                                        <Link href={`/movies/${m.id}`} className="block w-full text-center text-sm font-extrabold tracking-wide bg-pink-500 text-white hover:bg-cinema-neonPink rounded-md py-2">MUA VÉ</Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="p-3">
-                                            <h3 className="text-sm md:text-base font-bold text-neutral-darkGray mb-1 line-clamp-2 uppercase">{m.title}</h3>
-                                            {m.releaseDate && (
-                                                <div className="text-xs md:text-sm font-medium text-[#a74bd6]">Khởi chiếu {new Date(m.releaseDate).toLocaleDateString()}</div>
-                                            )}
-                                        </div>
-                                    </div>
+                                    <MovieCard key={m.id} movie={m}/>
                                 );
                             })}
                         </div>
