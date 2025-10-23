@@ -11,7 +11,7 @@ import {
   setSearchKeyword,
   setSelectedGenre,
   clearError
-} from '@/store/slices/genresSlice';
+} from '@/store/slices/genres/genresSlice';
 import { PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import GenreForm from "@/app/admin/movies/categories/_components/GenreForm";
 import DeleteConfirmModal from "@/app/admin/movies/categories/_components/DeleteConfirmModal";

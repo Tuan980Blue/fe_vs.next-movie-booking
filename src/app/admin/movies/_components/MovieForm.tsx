@@ -8,7 +8,7 @@ import {
   MovieResponse, 
   MovieStatus,
 } from '@/models/movie';
-import {fetchGenres} from "@/store/slices/genresSlice";
+import {fetchGenres} from "@/store/slices/genres/genresSlice";
 
 interface MovieFormProps {
   movie?: MovieResponse | null;

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreateMovieRequest, MovieStatus } from "@/models";
-import { createMovie } from "@/store/slices/moviesSlice";
-import { fetchGenres } from "@/store/slices/genresSlice";
+import { createMovie } from "@/store/slices/movies/moviesSlice";
+import { fetchGenres } from "@/store/slices/genres/genresSlice";
 import { useAppDispatch, useAppSelector } from "@/store/reduxhooks";
 import { ArrowLeftIcon, FilmIcon } from '@heroicons/react/24/outline';
 

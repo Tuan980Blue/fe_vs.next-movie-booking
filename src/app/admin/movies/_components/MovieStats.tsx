@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/reduxhooks';
-import { fetchMovieStats } from '@/store/slices/moviesSlice';
+import { fetchMovieStats } from '@/store/slices/movies/moviesSlice';
 
 export default function MovieStats() {
   const dispatch = useAppDispatch();

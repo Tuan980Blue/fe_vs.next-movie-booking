@@ -11,7 +11,7 @@ import {
     clearError,
     setSelectedMovie,
     clearSelectedMovie
-} from '@/store/slices/moviesSlice';
+} from '@/store/slices/movies/moviesSlice';
 import {
     CreateMovieRequest,
     UpdateMovieRequest,
