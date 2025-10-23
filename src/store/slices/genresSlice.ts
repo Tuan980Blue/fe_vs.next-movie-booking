@@ -184,6 +184,13 @@ const genresSlice = createSlice({
                 state.loading = false
                 state.error = (action.payload as string) || action.error.message || 'Failed to delete genre'
             })
+            
+            // Sync from other tab
+            .addCase('SYNC_FROM_OTHER_TAB', (state, action: any) => {
+                if (action.payload?.genres) {
+                    return action.payload.genres
+                }
+            })
     }
 })
 

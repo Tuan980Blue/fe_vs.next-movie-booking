@@ -309,6 +309,13 @@ const moviesSlice = createSlice({
                 state.error = (action.payload as string) || action.error.message || 'Failed to fetch movie stats'
             })
             
+            // Sync from other tab
+            .addCase('SYNC_FROM_OTHER_TAB', (state, action: any) => {
+                if (action.payload?.movies) {
+                    return action.payload.movies
+                }
+            })
+            
     }
 })
 
