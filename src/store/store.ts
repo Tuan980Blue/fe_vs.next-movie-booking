@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import moviesReducer from '@/store/slices/moviesSlice'
-import genresReducer from '@/store/slices/genresSlice'
+import moviesReducer from '@/store/slices/movies/moviesSlice'
+import genresReducer from '@/store/slices/genres/genresSlice'
 
 //Hàm configureStore là cách tạo store (kho chứa state trung tâm) trong Redux Toolkit.
 

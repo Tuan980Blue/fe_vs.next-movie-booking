@@ -3,16 +3,6 @@
 import {useEffect, useState} from 'react';
 import {useAppDispatch, useAppSelector} from '@/store/reduxhooks';
 import {
-    fetchMovies,
-    createMovie,
-    updateMovie,
-    deleteMovie,
-    changeMovieStatus,
-    clearError,
-    setSelectedMovie,
-    clearSelectedMovie
-} from '@/store/slices/moviesSlice';
-import {
     CreateMovieRequest,
     UpdateMovieRequest,
     MovieResponse,
@@ -24,6 +14,15 @@ import MovieModal from './_components/MovieModal';
 import DeleteConfirmModal from './_components/DeleteConfirmModal';
 import MovieActions from './_components/MovieActions';
 import {PlusIcon, MagnifyingGlassIcon, FunnelIcon} from '@heroicons/react/24/outline';
+import {
+    changeMovieStatus,
+    clearSelectedMovie,
+    createMovie,
+    deleteMovie,
+    fetchMovies, setSelectedMovie,
+    updateMovie
+} from "@/store/slices/movies";
+import {clearError} from "@/store/slices/genres";
 
 export default function ManageMovies() {
     const dispatch = useAppDispatch();

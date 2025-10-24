@@ -3,18 +3,15 @@
 import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/reduxhooks';
 import { GenreResponse, CreateGenreRequest, UpdateGenreRequest } from '@/models/movie';
-import { 
-  fetchGenres, 
-  createGenre, 
-  updateGenre, 
-  deleteGenre,
+import {
   setSearchKeyword,
   setSelectedGenre,
   clearError
-} from '@/store/slices/genresSlice';
+} from '@/store/slices/genres/genresSlice';
 import { PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import GenreForm from "@/app/admin/movies/categories/_components/GenreForm";
 import DeleteConfirmModal from "@/app/admin/movies/categories/_components/DeleteConfirmModal";
+import {createGenre, deleteGenre, fetchGenres, updateGenre} from "@/store/slices/genres";
 
 export default function ManageGenres() {
   const dispatch = useAppDispatch();
