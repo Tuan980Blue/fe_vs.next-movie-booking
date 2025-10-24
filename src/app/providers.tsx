@@ -1,22 +1,19 @@
 "use client";
 
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider } from "@/providers/AuthContext";
 import {Provider} from "react-redux";
 import {store} from "@/store/store";
-import {useEffect} from "react";
-import {initBroadcastSync} from "@/store/syncState";
+import SignalRInitializer from "@/providers/SignalRInitializer";
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
-    useEffect(() => {
-        //Thiết lập kênh BroadcastChannel, lắng nghe và gửi message giữa tab
-        initBroadcastSync(store);
-    }, []);
 
     return (
       <Provider store={store}>
-          <AuthProvider>
-              {children}
-          </AuthProvider>
+          <SignalRInitializer>
+              <AuthProvider>
+                  {children}
+              </AuthProvider>
+          </SignalRInitializer>
       </Provider>
   );
 }

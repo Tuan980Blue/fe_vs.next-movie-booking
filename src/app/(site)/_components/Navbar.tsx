@@ -3,8 +3,8 @@
 import {motion} from 'framer-motion';
 import Link from "next/link";
 import {useEffect, useRef, useState} from "react";
-import {useAuth} from "@/context/AuthContext";
-import {AdminOnly} from "@/context/RoleGuard";
+import {useAuth} from "@/providers/AuthContext";
+import {AdminOnly} from "@/components/author/RoleGuard";
 
 const Navbar = () => {
     const {isAuthenticated, user, logout} = useAuth();

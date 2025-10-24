@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, FormEvent, ChangeEvent } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/providers/AuthContext';
 import { changePasswordApi, updateProfileApi } from "@/service";
 
 interface EditForm {

@@ -4,7 +4,7 @@ import {useEffect, useMemo, useState, Suspense} from "react";
 import {motion} from "framer-motion";
 import SeatSelectionSkeleton from "@/app/(no-navbar)/booking/seat-selection/_components/SeatSelectionSkeleton";
 import {getSeatLayoutApi} from "@/service";
-import {useAuth} from "@/context/AuthContext";
+import {useAuth} from "@/providers/AuthContext";
 import {useRouter, useSearchParams} from "next/navigation";
 import type {SeatLayoutUi, SeatUi, SeatLegendItem} from "@/models/seat";
 
