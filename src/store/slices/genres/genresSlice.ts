@@ -15,6 +15,9 @@ const genresSlice = createSlice({
     name: 'genres',
     initialState,
     reducers: {
+        setGenres(state, action: PayloadAction<GenreResponse[]>) {
+            state.items = action.payload
+        },
         setSearchKeyword(state, action: PayloadAction<string>) {
             state.searchKeyword = action.payload
         },
@@ -69,7 +72,7 @@ const genresSlice = createSlice({
     },
 })
 
-export const { setSearchKeyword, setSelectedGenre, clearSelectedGenre, clearError } =
+export const {setGenres, setSearchKeyword, setSelectedGenre, clearSelectedGenre, clearError } =
     genresSlice.actions
 
 export default genresSlice.reducer

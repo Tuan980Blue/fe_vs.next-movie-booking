@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { AdminOnly } from "@/context/RoleGuard";
+import { useAuth } from "@/providers/AuthContext";
+import { AdminOnly } from "@/components/author/RoleGuard";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bars3Icon } from "@heroicons/react/24/outline";

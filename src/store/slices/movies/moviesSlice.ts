@@ -24,6 +24,9 @@ const moviesSlice = createSlice({
     name: 'movies',
     initialState,
     reducers: {
+        setMovies(state, action: PayloadAction<MovieResponse[]>) {
+            state.items = action.payload
+        },
         setPage(state, action: PayloadAction<number>) {
             state.page = action.payload
         },
@@ -163,7 +166,8 @@ const moviesSlice = createSlice({
     }
 })
 
-export const { 
+export const {
+    setMovies,
     setPage, 
     setPageSize, 
     clearError, 
@@ -171,6 +175,5 @@ export const {
     clearSelectedMovie 
 } = moviesSlice.actions
 
-console.log("Slice", moviesSlice)
 export default moviesSlice.reducer
 

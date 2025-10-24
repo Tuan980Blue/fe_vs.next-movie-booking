@@ -1,6 +1,6 @@
 "use client";
 
-import {useAuth} from "@/context/AuthContext";
+import {useAuth} from "@/providers/AuthContext";
 import type { Metadata } from "next";
 
 // Note: Since this is a client component, we can't export metadata here

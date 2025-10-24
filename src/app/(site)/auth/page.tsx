@@ -7,7 +7,7 @@ import EnhancedPopcornAnimation from "@/app/(site)/_components/EnhancedPopcornAn
 import LoginForm from "@/app/(site)/auth/_components/LoginForm";
 import RegisterForm from "@/app/(site)/auth/_components/RegisterForm";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAuth} from "@/context/AuthContext";
+import {useAuth} from "@/providers/AuthContext";
 
 const AuthContent = () => {
     const [currentView, setCurrentView] = useState('login'); // 'login', 'register'
