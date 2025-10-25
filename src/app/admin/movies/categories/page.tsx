@@ -22,10 +22,10 @@ export default function ManageGenres() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [genreToDelete, setGenreToDelete] = useState<GenreResponse | null>(null);
 
-  // Load genres on component mount
-  useEffect(() => {
-    dispatch(fetchGenres());
-  }, [dispatch]);
+    // Load genres on component mount
+    useEffect(() => {
+        dispatch(fetchGenres());
+    }, [dispatch]);
 
     // Filter genres based on search
     const filteredGenres = genres.filter(genre =>

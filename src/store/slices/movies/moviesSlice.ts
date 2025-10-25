@@ -42,6 +42,7 @@ const moviesSlice = createSlice({
         clearSelectedMovie(state) {
             state.selectedMovie = null
         },
+        resetMovies: ()=> initialState,
     },
     //xử lý kết quả của createAsyncThunk
     extraReducers: (builder) => {
@@ -172,7 +173,8 @@ export const {
     setPageSize, 
     clearError, 
     setSelectedMovie, 
-    clearSelectedMovie 
+    clearSelectedMovie,
+    resetMovies
 } = moviesSlice.actions
 
 export default moviesSlice.reducer

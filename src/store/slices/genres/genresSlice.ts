@@ -30,6 +30,7 @@ const genresSlice = createSlice({
         clearError(state) {
             state.error = null
         },
+        resetGenres: () => initialState,
     },
     extraReducers: (builder) => {
         builder
@@ -72,7 +73,7 @@ const genresSlice = createSlice({
     },
 })
 
-export const {setGenres, setSearchKeyword, setSelectedGenre, clearSelectedGenre, clearError } =
+export const {setGenres, setSearchKeyword, setSelectedGenre, clearSelectedGenre, clearError, resetGenres} =
     genresSlice.actions
 
 export default genresSlice.reducer

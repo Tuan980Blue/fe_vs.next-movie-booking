@@ -1,6 +1,5 @@
 import * as signalR from '@microsoft/signalr'
-import {getGenresApi, getMoviesApi} from "@/service";
-import {setGenres} from "@/store/slices/genres";
+import {getMoviesApi} from "@/service";
 import {setMovies} from "@/store/slices/movies";
 
 const hubUrl = process.env.NEXT_SIGNALR_URL || 'http://localhost:5000/hubs/app'
@@ -8,7 +7,11 @@ const hubUrl = process.env.NEXT_SIGNALR_URL || 'http://localhost:5000/hubs/app'
 let connection: signalR.HubConnection | null = null
 
 export const startSignalR = (dispatch: any) => {
-    if (connection) return connection
+    if (connection)
+    {
+        console.log("✅ SignalR connected pre")
+        return connection
+    }
 
     connection = new signalR.HubConnectionBuilder()
         .withUrl(hubUrl) // endpoint Hub bên .NET
@@ -19,13 +22,9 @@ export const startSignalR = (dispatch: any) => {
         .then(() => console.log('✅ SignalR connected'))
         .catch(err => console.error('❌ SignalR connection failed:', err))
 
-
-    //Lắng nghe các thay đổi để update state
-    connection.on("genres_updated", async () => {
-        const genres = await getGenresApi();
-        dispatch(setGenres(genres));
-    });
-    connection.on("movies_updated", async () => {
+    //Những event real-time cho toàn bộ client
+    //ví dụ (sau này sửa)
+    connection.on("notifies_updated", async () => {
         const movies = await getMoviesApi();
         dispatch(setMovies(movies.items));
     });

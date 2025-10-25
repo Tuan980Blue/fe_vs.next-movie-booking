@@ -1,18 +1,18 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { CreateMovieRequest, MovieStatus } from "@/models";
-import { useAppDispatch, useAppSelector } from "@/store/reduxhooks";
-import { ArrowLeftIcon, FilmIcon } from '@heroicons/react/24/outline';
+import {useState, useEffect} from 'react';
+import {useRouter} from 'next/navigation';
+import {CreateMovieRequest, MovieStatus} from "@/models";
+import {useAppDispatch, useAppSelector} from "@/store/reduxhooks";
+import {ArrowLeftIcon, FilmIcon} from '@heroicons/react/24/outline';
 import {fetchGenres} from "@/store/slices/genres";
 import {createMovie} from "@/store/slices/movies";
 
 const AddMovie = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const { items: genres, loading: genresLoading } = useAppSelector((state) => state.genres);
-    const { loading: moviesLoading, error } = useAppSelector((state) => state.movies);
+    const {items: genres, loading: genresLoading} = useAppSelector((state) => state.genres);
+    const {loading: moviesLoading, error} = useAppSelector((state) => state.movies);
 
     const [formData, setFormData] = useState<CreateMovieRequest>({
         title: '',
@@ -34,11 +34,8 @@ const AddMovie = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        // Load genres if not already loaded
-        if (genres.length === 0) {
-            dispatch(fetchGenres());
-        }
-    }, [dispatch, genres.length]);
+        dispatch(fetchGenres());
+    }, [dispatch]);
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -82,7 +79,7 @@ const AddMovie = () => {
 
     const handleCreateMovie = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -100,10 +97,10 @@ const AddMovie = () => {
     };
 
     const handleInputChange = (field: keyof CreateMovieRequest, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData(prev => ({...prev, [field]: value}));
         // Clear error when user starts typing
         if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }));
+            setErrors(prev => ({...prev, [field]: ''}));
         }
     };
 
@@ -117,10 +114,10 @@ const AddMovie = () => {
     };
 
     const statusOptions = [
-        { value: MovieStatus.Draft, label: 'Draft' },
-        { value: MovieStatus.ComingSoon, label: 'Coming Soon' },
-        { value: MovieStatus.NowShowing, label: 'Now Showing' },
-        { value: MovieStatus.Archived, label: 'Archived' },
+        {value: MovieStatus.Draft, label: 'Draft'},
+        {value: MovieStatus.ComingSoon, label: 'Coming Soon'},
+        {value: MovieStatus.NowShowing, label: 'Now Showing'},
+        {value: MovieStatus.Archived, label: 'Archived'},
     ];
 
     const loading = isSubmitting || moviesLoading;
@@ -135,11 +132,11 @@ const AddMovie = () => {
                             onClick={() => router.back()}
                             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mr-4"
                         >
-                            <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                            <ArrowLeftIcon className="h-5 w-5 mr-2"/>
                             Back
                         </button>
                         <div className="flex items-center">
-                            <FilmIcon className="h-8 w-8 text-blue-600 mr-3" />
+                            <FilmIcon className="h-8 w-8 text-blue-600 mr-3"/>
                             <div>
                                 <h1 className="text-3xl font-bold text-gray-900">Add New Movie</h1>
                                 <p className="text-gray-600">Create a new movie for your cinema system</p>
@@ -211,7 +208,8 @@ const AddMovie = () => {
                                     placeholder="Enter duration in minutes"
                                     disabled={loading}
                                 />
-                                {errors.durationMinutes && <p className="text-red-500 text-sm mt-1">{errors.durationMinutes}</p>}
+                                {errors.durationMinutes &&
+                                    <p className="text-red-500 text-sm mt-1">{errors.durationMinutes}</p>}
                             </div>
 
                             {/* Rated */}
@@ -325,7 +323,8 @@ const AddMovie = () => {
                                     placeholder="https://example.com/backdrop.jpg"
                                     disabled={loading}
                                 />
-                                {errors.backdropUrl && <p className="text-red-500 text-sm mt-1">{errors.backdropUrl}</p>}
+                                {errors.backdropUrl &&
+                                    <p className="text-red-500 text-sm mt-1">{errors.backdropUrl}</p>}
                             </div>
 
                             {/* Trailer URL */}
@@ -407,7 +406,8 @@ const AddMovie = () => {
                                 className="px-6 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors flex items-center"
                             >
                                 {loading && (
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    <div
+                                        className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                 )}
                                 {loading ? 'Creating...' : 'Create Movie'}
                             </button>

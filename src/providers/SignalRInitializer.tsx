@@ -8,8 +8,12 @@ export default function SignalRInitializer({children}: { children: React.ReactNo
     const dispatch = useDispatch()
 
     useEffect(() => {
-        startSignalR(dispatch)
-    }, [dispatch])
+        const connection = startSignalR(dispatch);
+
+        return () => {
+            connection?.stop();
+        };
+    }, [dispatch]);
 
     return children
 }
