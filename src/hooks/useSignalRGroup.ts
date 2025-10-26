@@ -12,7 +12,7 @@ export const useSignalRGroup = <T>(
     callback: Callback<T>
 ) => {
     useEffect(() => {
-        const connection = startSignalR(dispatch);
+        const connection = startSignalR();
 
         // Tham gia group
         connection.invoke('JoinGroup', groupName).catch(err => console.error(err));
@@ -25,7 +25,7 @@ export const useSignalRGroup = <T>(
             connection.invoke('LeaveGroup', groupName).catch(err => console.error(err));
             connection.off(eventName);
         };
-    }, [dispatch, groupName, eventName, callback]);
+    }, [groupName, eventName, callback]);
 };
 
 //Tham gia group và lắng nghe sự kiện
