@@ -6,7 +6,7 @@ import {GenreResponse, CreateGenreRequest, UpdateGenreRequest} from '@/models/mo
 import {
     setSearchKeyword,
     setSelectedGenre,
-    clearError
+    clearError, resetGenres
 } from '@/store/slices/genres/genresSlice';
 import {PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon} from '@heroicons/react/24/outline';
 import GenreForm from "@/app/admin/movies/categories/_components/GenreForm";
@@ -25,6 +25,10 @@ export default function ManageGenres() {
     // Load genres on component mount
     useEffect(() => {
         dispatch(fetchGenres());
+
+        return() => {
+            dispatch(resetGenres())
+        }
     }, [dispatch]);
 
     // Filter genres based on search

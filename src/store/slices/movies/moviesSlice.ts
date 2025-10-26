@@ -42,7 +42,7 @@ const moviesSlice = createSlice({
         clearSelectedMovie(state) {
             state.selectedMovie = null
         },
-        resetMovies: ()=> initialState,
+        resetMovies: ()=> ({...initialState}),
     },
     //xử lý kết quả của createAsyncThunk
     extraReducers: (builder) => {
@@ -156,14 +156,6 @@ const moviesSlice = createSlice({
                 state.loading = false
                 state.error = (action.payload as string) || action.error.message || 'Failed to fetch movie stats'
             })
-            
-            // Sync from other tab
-            .addCase('SYNC_FROM_OTHER_TAB', (state, action: any) => {
-                if (action.payload?.movies) {
-                    return action.payload.movies
-                }
-            })
-            
     }
 })
 

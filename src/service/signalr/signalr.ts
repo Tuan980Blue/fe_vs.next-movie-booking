@@ -1,12 +1,10 @@
 import * as signalR from '@microsoft/signalr'
-import {getMoviesApi} from "@/service";
-import {setMovies} from "@/store/slices/movies";
 
 const hubUrl = process.env.NEXT_SIGNALR_URL || 'http://localhost:5000/hubs/app'
 
 let connection: signalR.HubConnection | null = null
 
-export const startSignalR = (dispatch: any) => {
+export const startSignalR = () => {
     if (connection)
     {
         console.log("✅ SignalR connected pre")
@@ -25,8 +23,8 @@ export const startSignalR = (dispatch: any) => {
     //Những event real-time cho toàn bộ client
     //ví dụ (sau này sửa)
     connection.on("notifies_updated", async () => {
-        const movies = await getMoviesApi();
-        dispatch(setMovies(movies.items));
+        // const movies = await getMoviesApi();
+        // dispatch(setMovies(movies.items));
     });
 
     return connection

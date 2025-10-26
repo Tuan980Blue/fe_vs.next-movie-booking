@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation';
 import {CreateMovieRequest, MovieStatus} from "@/models";
 import {useAppDispatch, useAppSelector} from "@/store/reduxhooks";
 import {ArrowLeftIcon, FilmIcon} from '@heroicons/react/24/outline';
-import {fetchGenres} from "@/store/slices/genres";
+import {fetchGenres, resetGenres} from "@/store/slices/genres";
 import {createMovie} from "@/store/slices/movies";
 
 const AddMovie = () => {
@@ -35,6 +35,11 @@ const AddMovie = () => {
 
     useEffect(() => {
         dispatch(fetchGenres());
+
+        // RESET: khi unmout
+        return () => {
+            dispatch(resetGenres())
+        }
     }, [dispatch]);
 
     const validateForm = (): boolean => {
