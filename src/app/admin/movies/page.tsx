@@ -19,7 +19,7 @@ import {
     clearSelectedMovie,
     createMovie,
     deleteMovie,
-    fetchMovies, setSelectedMovie,
+    fetchMovies, resetMovies, setSelectedMovie,
     updateMovie
 } from "@/store/slices/movies";
 import {clearError} from "@/store/slices/genres";
@@ -60,8 +60,11 @@ export default function ManageMovies() {
                 console.error('Failed to load movies:', error);
             }
         };
-
         loadMovies();
+
+        return() => {
+            dispatch(resetMovies())
+        }
     }, [dispatch, searchParams]);
 
     // Handle create movie

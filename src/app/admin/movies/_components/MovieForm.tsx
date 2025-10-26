@@ -8,7 +8,7 @@ import {
     MovieResponse,
     MovieStatus,
 } from '@/models/movie';
-import {fetchGenres} from "@/store/slices/genres";
+import {fetchGenres, resetGenres} from "@/store/slices/genres";
 
 interface MovieFormProps {
     movie?: MovieResponse | null;
@@ -60,7 +60,12 @@ export default function MovieForm({movie, onSubmit, onCancel, loading = false}: 
                 genreIds: movie.genres?.map(g => g.id) || [],
             });
         }
-    }, [movie, dispatch, genres.length]);
+
+        // RESET: khi unmout
+        return () => {
+            dispatch(resetGenres())
+        }
+    }, [movie, dispatch]);
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};

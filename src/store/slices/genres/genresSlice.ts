@@ -30,7 +30,7 @@ const genresSlice = createSlice({
         clearError(state) {
             state.error = null
         },
-        resetGenres: () => initialState,
+        resetGenres: () => ({ ...initialState }),
     },
     extraReducers: (builder) => {
         builder
@@ -49,26 +49,36 @@ const genresSlice = createSlice({
             })
 
             // create
+            .addCase(createGenre.pending, (state) => { state.loading = true })
             .addCase(createGenre.fulfilled, (state, action) => {
                 state.items.unshift(action.payload)
             })
+            .addCase(createGenre.rejected, (state, action) =>{
+                state.loading = false
+                state.error = action.error.message || 'Failed to create genre'
+            })
 
             // update
+            .addCase(updateGenre.pending, (state) => { state.loading = true })
             .addCase(updateGenre.fulfilled, (state, action) => {
                 const index = state.items.findIndex((g) => g.id === action.payload.id)
                 if (index !== -1) state.items[index] = action.payload
                 if (state.selectedGenre?.id === action.payload.id) state.selectedGenre = action.payload
             })
+            .addCase(updateGenre.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message || 'Failed to create genre'
+            })
 
             // delete
+            .addCase(deleteGenre.pending, (state) => { state.loading = true })
             .addCase(deleteGenre.fulfilled, (state, action) => {
                 state.items = state.items.filter((g) => g.id !== action.payload)
                 if (state.selectedGenre?.id === action.payload) state.selectedGenre = null
             })
-
-            // sync cross-tab
-            .addCase('SYNC_FROM_OTHER_TAB', (state, action: any) => {
-                if (action.payload?.genres) return action.payload.genres
+            .addCase(deleteGenre.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message || 'Failed to create genre'
             })
     },
 })
