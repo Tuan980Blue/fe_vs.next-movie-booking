@@ -30,7 +30,7 @@ const genresSlice = createSlice({
         clearError(state) {
             state.error = null
         },
-        resetGenres: () => ({ ...initialState }),
+        resetGenres: () => initialState,
     },
     extraReducers: (builder) => {
         builder
@@ -51,6 +51,7 @@ const genresSlice = createSlice({
             // create
             .addCase(createGenre.pending, (state) => { state.loading = true })
             .addCase(createGenre.fulfilled, (state, action) => {
+                state.loading = false
                 state.items.unshift(action.payload)
             })
             .addCase(createGenre.rejected, (state, action) =>{
@@ -61,6 +62,7 @@ const genresSlice = createSlice({
             // update
             .addCase(updateGenre.pending, (state) => { state.loading = true })
             .addCase(updateGenre.fulfilled, (state, action) => {
+                state.loading = false
                 const index = state.items.findIndex((g) => g.id === action.payload.id)
                 if (index !== -1) state.items[index] = action.payload
                 if (state.selectedGenre?.id === action.payload.id) state.selectedGenre = action.payload
@@ -73,6 +75,7 @@ const genresSlice = createSlice({
             // delete
             .addCase(deleteGenre.pending, (state) => { state.loading = true })
             .addCase(deleteGenre.fulfilled, (state, action) => {
+                state.loading = false
                 state.items = state.items.filter((g) => g.id !== action.payload)
                 if (state.selectedGenre?.id === action.payload) state.selectedGenre = null
             })

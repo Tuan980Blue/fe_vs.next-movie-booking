@@ -42,7 +42,7 @@ const moviesSlice = createSlice({
         clearSelectedMovie(state) {
             state.selectedMovie = null
         },
-        resetMovies: ()=> ({...initialState}),
+        resetMovies: () => initialState,
     },
     //xử lý kết quả của createAsyncThunk
     extraReducers: (builder) => {
