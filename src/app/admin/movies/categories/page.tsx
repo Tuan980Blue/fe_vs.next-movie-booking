@@ -12,6 +12,8 @@ import {PlusIcon, MagnifyingGlassIcon, PencilIcon, TrashIcon} from '@heroicons/r
 import GenreForm from "@/app/admin/movies/categories/_components/GenreForm";
 import DeleteConfirmModal from "@/app/admin/movies/categories/_components/DeleteConfirmModal";
 import {createGenre, deleteGenre, fetchGenres, updateGenre} from "@/store/slices/genres";
+import {useSignalRGroup} from "@/hooks/useSignalRGroup";
+import {handleGenresUpdated} from "@/handlers";
 
 export default function ManageGenres() {
     const dispatch = useAppDispatch();
@@ -30,6 +32,9 @@ export default function ManageGenres() {
             dispatch(resetGenres())
         }
     }, [dispatch]);
+
+    //Join group genre
+    useSignalRGroup("genres", "genres_updated", () => handleGenresUpdated(dispatch))
 
     // Filter genres based on search
     const filteredGenres = genres.filter(genre =>

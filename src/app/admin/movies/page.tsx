@@ -23,6 +23,8 @@ import {
     updateMovie
 } from "@/store/slices/movies";
 import {clearError} from "@/store/slices/genres";
+import {useSignalRGroup} from "@/hooks/useSignalRGroup";
+import {handleMoviesUpdated} from "@/handlers";
 
 export default function ManageMovies() {
     const dispatch = useAppDispatch();
@@ -66,6 +68,9 @@ export default function ManageMovies() {
             dispatch(resetMovies())
         }
     }, [dispatch, searchParams]);
+
+    //Join group movies
+    useSignalRGroup("movies", "movies_updated", () => handleMoviesUpdated(dispatch))
 
     // Handle create movie
     const handleCreateMovie = async (data: CreateMovieRequest) => {

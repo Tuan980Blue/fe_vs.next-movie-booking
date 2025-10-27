@@ -7,6 +7,8 @@ import {useAppDispatch, useAppSelector} from "@/store/reduxhooks";
 import {ArrowLeftIcon, FilmIcon} from '@heroicons/react/24/outline';
 import {fetchGenres, resetGenres} from "@/store/slices/genres";
 import {createMovie} from "@/store/slices/movies";
+import {useSignalRGroup} from "@/hooks/useSignalRGroup";
+import {handleGenresUpdated} from "@/handlers";
 
 const AddMovie = () => {
     const router = useRouter();
@@ -41,6 +43,9 @@ const AddMovie = () => {
             dispatch(resetGenres())
         }
     }, [dispatch]);
+
+    //Join group genre
+    useSignalRGroup("genres", "genres_updated", () => handleGenresUpdated(dispatch))
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};

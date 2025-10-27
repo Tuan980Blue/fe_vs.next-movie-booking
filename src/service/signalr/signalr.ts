@@ -7,7 +7,7 @@ let connection: signalR.HubConnection | null = null
 export const startSignalR = () => {
     if (connection)
     {
-        console.log("✅ SignalR connected pre")
+        console.log("✅ SignalR pre connected")
         return connection
     }
 
@@ -16,9 +16,25 @@ export const startSignalR = () => {
         .withAutomaticReconnect()
         .build()
 
-    connection.start()
-        .then(() => console.log('✅ SignalR connected'))
-        .catch(err => console.error('❌ SignalR connection failed:', err))
+    // Khởi động kết nối
+    const start = async () => {
+        try {
+            //Tránh connection.start() bị gọi song song
+            if (connection?.state === signalR.HubConnectionState.Disconnected) {
+                await connection.start();
+                console.log("✅ SignalR state", connection.state);
+            }
+        } catch (err) {
+            console.error("❌ SignalR connection failed:", err);
+            setTimeout(start, 5000); // retry sau 5s nếu lỗi
+        }
+    };
+
+    start();
+
+    // Log lifecycle
+    connection.onreconnected(() => console.log("♻️ SignalR reconnected"));
+    connection.onclose(() => console.warn("⚠️ SignalR disconnected"));
 
     //Những event real-time cho toàn bộ client
     //ví dụ (sau này sửa)

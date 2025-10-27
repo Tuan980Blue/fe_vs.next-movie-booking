@@ -9,6 +9,8 @@ import {
     MovieStatus,
 } from '@/models/movie';
 import {fetchGenres, resetGenres} from "@/store/slices/genres";
+import {useSignalRGroup} from "@/hooks/useSignalRGroup";
+import {handleGenresUpdated} from "@/handlers";
 
 interface MovieFormProps {
     movie?: MovieResponse | null;
@@ -66,6 +68,9 @@ export default function MovieForm({movie, onSubmit, onCancel, loading = false}: 
             dispatch(resetGenres())
         }
     }, [movie, dispatch]);
+
+    //Join group genre
+    useSignalRGroup("genres", "genres_updated", () => handleGenresUpdated(dispatch))
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
