@@ -1,6 +1,5 @@
 import {useEffect, useCallback} from "react";
 import {startSignalR} from "@/service/signalr/signalr";
-import {AppDispatch} from "@/store/store";
 
 /**
  * Hook lắng nghe SignalR group + event, tự động join/leave & rejoin khi reconnect.

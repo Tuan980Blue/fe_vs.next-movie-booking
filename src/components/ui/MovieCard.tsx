@@ -84,7 +84,7 @@ const MovieCard = ({movie}: MovieCardProps) => {
                     </div>
                 )}
                 <div className="mt-1 text-[13px] text-white/80">
-                    ⭐ <span className="font-semibold">4.8</span>/5
+                    ⭐ <span className="font-semibold">8.5</span>/10
                 </div>
 
             </div>
