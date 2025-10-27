@@ -17,15 +17,15 @@ const StepsHeader = () => {
     ];
 
     return (
-        <div className="sticky top-0 z-20 w-full">
+        <div className="fixed top-0 z-20 w-full">
             <div className="bg-white/80 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-neutral-lightGray/40 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
+                <div className="px-4 lg:px-8">
+                    <div className="flex items-center justify-between h-16 gap-10">
                         {/* Left: Back button */}
                         <motion.button
                             type="button"
                             onClick={() => router.back()}
-                            className="group inline-flex items-center gap-2 text-neutral-darkGray hover:text-primary-pink transition-colors"
+                            className="group inline-flex items-center gap-2 text-neutral-darkGray hover:text-primary-pink transition-colors cursor-pointer"
                             aria-label="Quay lại"
                             title="Quay lại"
                             whileHover={{scale: 1.03}}
@@ -39,7 +39,7 @@ const StepsHeader = () => {
                             <span className="hidden sm:inline text-sm font-semibold">Quay lại</span>
                         </motion.button>
 
-                        {/* Center: Steps (re-coded progress bar using after pseudo elements) */}
+                        {/* Steps  */}
                         <div className="flex-1 px-4">
                             <div className="mx-auto">
                                 <div className="relative pt-6">
@@ -75,7 +75,7 @@ const StepsHeader = () => {
                                                                 )}
                                                             </span>
                                                         </div>
-                                                        <div className="mt-2 text-center self-start w-10 lg:w-12">
+                                                        <div className="mt-1 text-center self-start w-10 lg:w-12">
                                                             <div className={`text-[12px] font-semibold ${isActive ? 'text-neutral-darkGray' : 'text-neutral-darkGray/90'}`}>{s.label}</div>
                                                         </div>
                                                     </div>
@@ -86,19 +86,6 @@ const StepsHeader = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Right: Logo/Brand */}
-                        <Link href="/" className="inline-flex items-center" aria-label="Trang chủ">
-                            <motion.div className="flex items-center space-x-2" whileTap={{scale: 0.97}}>
-                                <div className="w-10 h-10 rounded-full overflow-hidden">
-                                    <img src="/logo.png" alt="TA MEM CINEMA Logo" className="w-full h-full object-cover"/>
-                                </div>
-                                <div className="hidden sm:block leading-tight">
-                                    <div className="text-primary-pink font-bold text-base">TA MEM</div>
-                                    <div className="text-primary-purple font-semibold text-xs -mt-0.5">CINEMA</div>
-                                </div>
-                            </motion.div>
-                        </Link>
                     </div>
                 </div>
             </div>
