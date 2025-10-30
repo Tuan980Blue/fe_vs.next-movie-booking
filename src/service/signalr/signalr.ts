@@ -1,6 +1,6 @@
 import * as signalR from '@microsoft/signalr'
 
-const hubUrl = process.env.NEXT_SIGNALR_URL || 'http://localhost:5000/hubs/app'
+const hubUrl = process.env.NEXT_PUBLIC_SIGNALR_URL || 'http://localhost:5000/hubs/app'
 
 let connection: signalR.HubConnection | null = null
 
