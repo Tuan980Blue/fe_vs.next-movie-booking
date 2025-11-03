@@ -11,7 +11,7 @@ export default function BookingLayout({children}: { children: React.ReactNode })
             <StepsHeader/>
 
             {/* Content */}
-            <div className="">
+            <div className="mt-16">
                 {children}
             </div>
         </div>

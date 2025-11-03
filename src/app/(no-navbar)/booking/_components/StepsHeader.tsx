@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import {usePathname, useRouter} from "next/navigation";
-import Link from "next/link";
 
 const StepsHeader = () => {
     const pathname = usePathname();
@@ -20,7 +19,7 @@ const StepsHeader = () => {
         <div className="fixed top-0 z-20 w-full">
             <div className="bg-white/80 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b border-neutral-lightGray/40 shadow-sm">
                 <div className="px-4 lg:px-8">
-                    <div className="flex items-center justify-between h-16 gap-10">
+                    <div className="flex items-center justify-between h-20 gap-10">
                         {/* Left: Back button */}
                         <motion.button
                             type="button"
@@ -42,8 +41,8 @@ const StepsHeader = () => {
                         {/* Steps  */}
                         <div className="flex-1 px-4">
                             <div className="mx-auto">
-                                <div className="relative pt-6">
-                                    <ol className="flex items-center w-full flex-nowrap">
+                                <div className="relative pt-4">
+                                    <ol className="flex items-start flex-nowrap">
                                         {steps.map((s, index) => {
                                             const isActive = s.id === step;
                                             const isDone = s.id < step;
@@ -75,8 +74,8 @@ const StepsHeader = () => {
                                                                 )}
                                                             </span>
                                                         </div>
-                                                        <div className="mt-1 text-center self-start w-10 lg:w-12">
-                                                            <div className={`text-[12px] font-semibold ${isActive ? 'text-neutral-darkGray' : 'text-neutral-darkGray/90'}`}>{s.label}</div>
+                                                        <div className=" text-center self-start w-fit">
+                                                            <div className={`text-[12px] font-semibold ${isActive ? 'text-primary-pink' : 'text-neutral-darkGray/70'}`}>{s.label}</div>
                                                         </div>
                                                     </div>
                                                 </li>
