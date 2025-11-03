@@ -1,19 +1,17 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
-import { ShowtimeSearchParams, ShowtimeListResponse } from '../../models/showtime';
-import type { ApiResponse } from '../../models/common';
+import {ApiResponse, ShowtimeListResponse, ShowtimeReadDto, ShowtimeSearchParams} from "@/models";
 
 /**
- * Fetch paginated list of showtimes
- * params can include: page, pageSize, date, movieId, theaterId, auditoriumId, sort
- * Returns shape: { items: Showtime[], page, pageSize, totalItems }
+ * Fetch showtime detail by ID
+ * Returns a single showtime with all details
  */
-export async function getShowtimesApi(params: ShowtimeSearchParams = {}): Promise<ShowtimeListResponse> {
-  const { data } = await httpClient.get(endpoints.showtimes.list, { params });
-  // Support both raw paginated response and ApiResponse wrapper
-  const wrapped = data as ApiResponse<ShowtimeListResponse>;
+export async function getShowtimeByIdApi(id: string): Promise<ShowtimeReadDto> {
+  const { data } = await httpClient.get(endpoints.showtimes.detail(id));
+  // Support both raw response and ApiResponse wrapper
+  const wrapped = data as ApiResponse<ShowtimeReadDto>;
   const isWrapped = typeof wrapped === 'object' && wrapped !== null && 'success' in wrapped && 'data' in wrapped;
-  return (isWrapped ? wrapped.data : data) as ShowtimeListResponse;
+  return (isWrapped ? wrapped.data : data) as ShowtimeReadDto;
 }
 
 /**

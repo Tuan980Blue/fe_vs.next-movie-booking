@@ -58,6 +58,28 @@ export interface UpdateShowtimeRequest {
   basePriceMinor?: number;
 }
 
+// Backend response type (flattened structure from ShowtimeReadDto)
+export interface ShowtimeReadDto {
+  id: string;
+  movieId: string;
+  movieTitle: string;
+  movieDurationMinutes: number;
+  moviePosterUrl?: string | null;
+  roomId: string;
+  roomName: string;
+  roomCode: string;
+  cinemaId: string;
+  cinemaName: string;
+  cinemaAddress: string;
+  startUtc: string;
+  endUtc: string;
+  language: string;
+  subtitle: boolean;
+  format: string; // "TwoD", "ThreeD", "Imax"
+  basePriceMinor: number;
+  createdAt: string;
+}
+
 // API Response types
 export interface ShowtimeResponse {
   id: string;

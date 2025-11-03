@@ -78,6 +78,7 @@ const endpoints = {
   // Showtime endpoints
   showtimes: {
     list: '/showtimes',
+    detail: (id: string) => `/showtimes/${id}`,
     byMovie: (movieId: string) => `/showtimes/movie/${movieId}`,
     create: '/showtimes',
     update: (id: string) => `/showtimes/${id}`,
