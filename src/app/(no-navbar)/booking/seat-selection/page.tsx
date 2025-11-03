@@ -3,38 +3,65 @@
 import {useEffect, useMemo, useState, Suspense} from "react";
 import {motion} from "framer-motion";
 import SeatSelectionSkeleton from "@/app/(no-navbar)/booking/seat-selection/_components/SeatSelectionSkeleton";
-import {getSeatLayoutApi} from "@/service";
+import {getSeatLayoutApi, getShowtimeByIdApi} from "@/service";
 import {useAuth} from "@/providers/AuthContext";
 import {useRouter, useSearchParams} from "next/navigation";
 import type {SeatLayoutUi, SeatUi, SeatLegendItem} from "@/models/seat";
+import type {ShowtimeReadDto} from "@/models/showtime";
 
 const SeatSelectionContent = () => {
     const router = useRouter();
 
     const searchParams = useSearchParams();
-    const showtimeParam = searchParams.get('showtime');
-    const showtime = showtimeParam ? JSON.parse(showtimeParam) : null;
+    const showtimeId = searchParams.get('id');
 
     const {user, isAuthenticated} = useAuth();
     const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([]);
     const [secondsLeft, setSecondsLeft] = useState<number>(5 * 60);
 
+    const [showtime, setShowtime] = useState<ShowtimeReadDto | null>(null);
     const [layout, setLayout] = useState<SeatLayoutUi | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
-    // Nếu không có state (reload trang trực tiếp), điều hướng ngược lại bằng effect
+    // Fetch showtime data by ID
     useEffect(() => {
-        if (!showtime.cinemaId || !showtime.roomId) {
-            router.back();
-        }
-    }, [showtime.cinemaId, showtime.roomId, router]);
+        let ignore = false;
 
+        async function fetchShowtime() {
+            if (!showtimeId) {
+                router.back();
+                return;
+            }
+            try {
+                setLoading(true);
+                setError('');
+                const data = await getShowtimeByIdApi(showtimeId);
+                if (!ignore) {
+                    setShowtime(data);
+                }
+            } catch (e: unknown) {
+                if (!ignore) {
+                    setError(e instanceof Error ? e.message : 'Không thể tải thông tin suất chiếu');
+                    router.back();
+                }
+            } finally {
+                if (!ignore) setLoading(false);
+            }
+        }
+
+        fetchShowtime();
+        return () => {
+            ignore = true;
+        };
+    }, [showtimeId, router]);
+
+    // Fetch seat layout after showtime is loaded
     useEffect(() => {
         let ignore = false;
 
         async function fetchLayout() {
-            if (!showtime.cinemaId || !showtime.roomId) return;
+            if (!showtime?.cinemaId || !showtime?.roomId) return;
             try {
                 setLoading(true);
                 setError('');
@@ -51,7 +78,7 @@ const SeatSelectionContent = () => {
         return () => {
             ignore = true;
         };
-    }, [showtime.cinemaId, showtime.roomId]);
+    }, [showtime?.cinemaId, showtime?.roomId]);
 
     const seatLegend = useMemo<SeatLegendItem[]>(() => layout?.seatTypes || [], [layout]);
 
@@ -129,7 +156,11 @@ const SeatSelectionContent = () => {
         });
     };
 
-    if (!showtime) {
+    if (!showtime && loading) {
+        return <SeatSelectionSkeleton/>;
+    }
+
+    if (!showtime && !loading) {
         return <div className="min-h-screen py-16 px-4 lg:px-8 text-neutral-white">Đang chuyển hướng...</div>;
     }
 
@@ -364,7 +395,7 @@ const SeatSelectionContent = () => {
                             <div className="space-y-4 text-neutral-darkGray">
                                 <div>
                                     <p
-                                        className="mt-1 text-pink-500 text-sm lg:text-lg font-bold italic">{showtime.movieTitle}</p>
+                                        className="mt-1 text-pink-500 text-sm lg:text-lg font-bold italic">{showtime?.movieTitle}</p>
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-3 text-sm">
@@ -377,7 +408,7 @@ const SeatSelectionContent = () => {
                                                   strokeWidth="1.5"/>
                                         </svg>
                                         <div>
-                                            {toDate(showtime.startUtc)?.toLocaleDateString('vi-VN', {
+                                            {toDate(showtime?.startUtc)?.toLocaleDateString('vi-VN', {
                                                 weekday: 'short',
                                                 day: '2-digit',
                                                 month: '2-digit',
@@ -393,16 +424,16 @@ const SeatSelectionContent = () => {
                                             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
                                         </svg>
                                         <div>
-                                            {toDate(showtime.startUtc)?.toLocaleTimeString('vi-VN', {
+                                            {toDate(showtime?.startUtc)?.toLocaleTimeString('vi-VN', {
                                                 hour: '2-digit',
                                                 minute: '2-digit'
-                                            })} - {toDate(showtime.endUtc)?.toLocaleTimeString('vi-VN', {
+                                            })} - {toDate(showtime?.endUtc)?.toLocaleTimeString('vi-VN', {
                                             hour: '2-digit',
                                             minute: '2-digit'
                                         })}
                                         </div>
                                     </div>
-                                    {(showtime?.roomName || showtime?.auditoriumName || showtime?.cinemaName) && (
+                                    {(showtime?.roomName || showtime?.cinemaName) && (
                                         <div className="flex items-center gap-2">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                                  xmlns="http://www.w3.org/2000/svg" className="text-primary-pink">
@@ -412,7 +443,7 @@ const SeatSelectionContent = () => {
                                                 <circle cx="12" cy="11" r="2.5" stroke="currentColor"
                                                         strokeWidth="1.5"/>
                                             </svg>
-                                            <div>{showtime.roomName || showtime.auditoriumName} • {showtime.cinemaName}</div>
+                                            <div>{showtime.roomName} • {showtime.cinemaName}</div>
                                         </div>
                                     )}
                                 </div>
