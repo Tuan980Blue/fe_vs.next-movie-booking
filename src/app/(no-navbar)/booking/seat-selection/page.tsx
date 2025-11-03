@@ -8,21 +8,6 @@ import {useAuth} from "@/providers/AuthContext";
 import {useRouter, useSearchParams} from "next/navigation";
 import type {SeatLayoutUi, SeatUi, SeatLegendItem} from "@/models/seat";
 
-interface Showtime {
-    id: string | null;
-    cinemaId: string | null;
-    roomId: string | null;
-    startUtc: string | null;
-    endUtc?: string | null;
-    movieTitle?: string | null;
-    roomName?: string | null;
-    auditoriumName?: string | null;
-    cinemaName?: string | null;
-    basePriceMinor?: string | null;
-    format?: string | null;
-    subtitle?: string | null;
-}
-
 const SeatSelectionContent = () => {
     const router = useRouter();
 
@@ -132,29 +117,10 @@ const SeatSelectionContent = () => {
         if (!isSeatActive(seat)) return;
 
         setSelectedSeatIds((cur) => {
-            let next = cur.includes(seat.id) ? cur.filter((x) => x !== seat.id) : [...cur, seat.id];
+            const next = cur.includes(seat.id) ? cur.filter((x) => x !== seat.id) : [...cur, seat.id];
 
-            // Couple rule: only auto-pair if the pair is physically adjacent (<= 50px apart)
-            if (String(seat.seatType).toLowerCase() === 'couple') {
-                const unit = 50;
-                const rowSeats = getRowSeats(seat.rowLabel).filter(
-                    (s) => String(s.seatType).toLowerCase() === 'couple'
-                );
-                const pair = rowSeats.find(
-                    (s) =>
-                        Math.abs(s.seatNumber - seat.seatNumber) === 1 &&
-                        Math.abs((s.positionX ?? 0) - (seat.positionX ?? 0)) <= unit
-                );
-                if (pair && isSeatActive(pair)) {
-                    const bothSelected = next.includes(seat.id) && next.includes(pair.id);
-                    if (!bothSelected) {
-                        next = Array.from(new Set([...next, seat.id, pair.id]));
-                    }
-                }
-            }
-
-            // Single-seat gap rule check within the seat row
-            if (violatesSingleGapRule(seat.rowLabel, next)) {
+            const isCoupleSeat = String(seat.seatType).toLowerCase() === 'couple';
+            if (!isCoupleSeat && violatesSingleGapRule(seat.rowLabel, next)) {
                 // revert change
                 return cur;
             }
@@ -173,18 +139,17 @@ const SeatSelectionContent = () => {
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left: Seat map */}
                 <div className="lg:col-span-2">
-                    <div className="flex item-end justify-between gap-4">
-                        <div className="text-center">
-                            <div className="text-xs text-gray-800/80 font-medium">Giữ chỗ còn</div>
-                            <motion.div
-                                className="inline-flex items-center"
-                                animate={{scale: [1, 1.05, 1]}}
-                                transition={{duration: 2, repeat: Infinity}}
-                            >
-                                        <span
-                                            className="text-pink-500 font-bold text-xl tabular-nums">{minutes}:{seconds}</span>
-                            </motion.div>
-                        </div>
+                    <div className="flex items-center justify-end text-xs text-gray-800/80 font-medium gap-2">
+                        <span>Giữ chỗ còn</span>
+                        <motion.div
+                            className="inline-flex items-center"
+                            animate={{scale: [1, 1.05, 1]}}
+                            transition={{duration: 2, repeat: Infinity}}
+                        >
+                            <span className="text-pink-500 font-bold text-lg tabular-nums">
+                                {minutes}:{seconds}
+                            </span>
+                        </motion.div>
                     </div>
 
                     {!loading && error && (
@@ -322,9 +287,7 @@ const SeatSelectionContent = () => {
                                                                                 width,
                                                                                 borderColor: selected ? '#FACC15' : 'rgba(156, 163, 175, 0.3)'
                                                                             }}
-                                                                            whileHover={{scale: 1.05}}
-                                                                            whileTap={{scale: 0.95}}
-                                                                            animate={selected ? {scale: [1, 1.1, 1]} : {}}
+                                                                            whileHover={{backgroundColor: '#FACC15'}}
                                                                             transition={{duration: 0.3}}
                                                                         >
                                                                             {s.seatNumber}
