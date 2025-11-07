@@ -8,6 +8,7 @@ import {useAuth} from "@/providers/AuthContext";
 import {useRouter, useSearchParams} from "next/navigation";
 import type {SeatLayoutUi, SeatUi, SeatLegendItem} from "@/models/seat";
 import type {ShowtimeReadDto} from "@/models/showtime";
+import {useSignalRGroup} from "@/hooks/useSignalRGroup";
 
 const SeatSelectionContent = () => {
     const router = useRouter();
@@ -23,6 +24,39 @@ const SeatSelectionContent = () => {
     const [layout, setLayout] = useState<SeatLayoutUi | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
+
+    //Join group
+    // Handler khi có ghế bị lock, unlock và booked (trạng thái ghế available, locked, booked)
+    type SeatLockEvent = {
+        action: "lock" | "unlock" | "booked";
+        lockedSeatIds?: string[];
+        unlockedSeatIds?: string[];
+        bookedSeatIds?: string[];
+        expiresAt?: string;
+    };
+
+    useSignalRGroup<SeatLockEvent>(
+        `showtime-${showtimeId}`,
+        "SeatsLockUpdated",
+        (data) => {
+            switch (data.action) {
+                case "lock":
+                    console.log("Sự kiện lock ghế", data.lockedSeatIds);
+                    break;
+                case "unlock":
+                    console.log("Sự kiện unlock ghế", data.unlockedSeatIds);
+                    break;
+                case "booked":
+                    console.log("Sự kiện book ghế", data.bookedSeatIds);
+                    break;
+                default:
+                    console.warn("⚠️ Nhận Action không xác định:", data);
+                    break;
+            }
+        }
+    );
+
+    //Sử dụng promise.all để fetch các api cần thiết trước khi render ghế
 
     // Fetch showtime data by ID
     useEffect(() => {
