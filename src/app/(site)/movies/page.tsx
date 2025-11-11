@@ -3,8 +3,9 @@
 import {useEffect, useMemo, useState} from "react";
 import MoviePageSkeleton from "@/app/(site)/movies/_components/MoviePageSkeleton";
 import {getMoviesApi} from "@/service";
-import { MovieStatus, type MovieResponse, type MovieListResponse, type MovieSearchParams } from "@/models/movie";
+import { MovieStatus, type MovieResponse, type MovieSearchDto } from "@/models/movie";
 import MovieCard from "@/components/ui/MovieCard";
+import {type PagedResult} from "@/models";
 
 // Note: Since this is a client component, we can't export metadata here
 // We'll need to create a separate metadata file or move metadata to a parent layout
@@ -39,22 +40,19 @@ const MoviesPage = () => {
             setIsLoading(true);
             setError('');
             try {
-                const sortField: 'title' | 'releaseDate' | 'createdAt' = sort.startsWith('title') ? 'title' : 'releaseDate';
-                const order: 'asc' | 'desc' = sort.endsWith('_asc') ? 'asc' : 'desc';
+                const sortBy: string = sort.startsWith('title') ? 'title' : 'releaseDate';
+                const sortDirection: 'asc' | 'desc' = sort.endsWith('_asc') ? 'asc' : 'desc';
 
-                const params: MovieSearchParams & { genre?: string; rated?: string } = {
+                const params: MovieSearchDto = {
                     page,
                     pageSize,
-                    keyword: debouncedKeyword || undefined,
-                    // Backend expects 'genre' not 'genreId' per models; keep current param name if API supports it
-                    genre: genreId || undefined,
-                    // rated is not in MovieSearchParams; send through as is if backend supports
-                    rated: rated || undefined,
+                    search: debouncedKeyword || undefined,
+                    genreIds: genreId ? [genreId] : undefined,
                     status: status === 'All' ? undefined : (status === 'NowShowing' ? MovieStatus.NowShowing : status === 'ComingSoon' ? MovieStatus.ComingSoon : MovieStatus.Archived),
-                    sort: sortField,
-                    order,
+                    sortBy,
+                    sortDirection,
                 };
-                const data: MovieListResponse = await getMoviesApi(params);
+                const data: PagedResult<MovieResponse> = await getMoviesApi(params);
                 if (!isMounted) return;
                 setMovies(Array.isArray(data?.items) ? data.items : []);
                 setTotalItems(Number.isFinite(data?.totalItems) ? data.totalItems : 0);
@@ -68,7 +66,7 @@ const MoviesPage = () => {
         };
         fetchData();
         return () => { isMounted = false; };
-    }, [page, pageSize, debouncedKeyword, genreId, rated, status, sort]);
+    }, [page, pageSize, debouncedKeyword, genreId, status, sort]);
 
     const handlePrev = () => setPage((p) => Math.max(1, p - 1));
     const handleNext = () => setPage((p) => Math.min(totalPages, p + 1));
@@ -128,16 +126,7 @@ const MoviesPage = () => {
                             ))}
                         </select>
 
-                        <select
-                            value={rated}
-                            onChange={(e) => { setRated(e.target.value); setPage(1); }}
-                            className="border border-neutral-lightGray rounded-md px-3 py-2"
-                        >
-                            <option value="">Độ tuổi: Tất cả</option>
-                            {Array.from(new Set(movies.map(m => m.rated).filter(Boolean))).map((r) => (
-                                <option key={r} value={r}>{r}</option>
-                            ))}
-                        </select>
+                        {/* Rated filter removed - not supported in backend MovieSearchDto */}
 
                         <div className="flex items-center gap-2">
                             <select

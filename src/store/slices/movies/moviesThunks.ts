@@ -1,11 +1,12 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {
     CreateMovieRequest,
-    MovieListResponse,
     MovieResponse,
-    MovieSearchParams,
+    MovieSearchDto,
     MovieStatus,
-    UpdateMovieRequest
+    UpdateMovieRequest,
+    PagedResult,
+    MovieStatsDto
 } from "@/models";
 import {
     changeMovieStatusApi,
@@ -16,7 +17,7 @@ import {
     updateMovieApi
 } from "@/service";
 
-export const fetchMovies = createAsyncThunk<MovieListResponse, MovieSearchParams | undefined>(
+export const fetchMovies = createAsyncThunk<PagedResult<MovieResponse>, MovieSearchDto | undefined>(
     'movies/fetchMovies',
     async (params, { rejectWithValue }) => {
         try {
@@ -98,7 +99,7 @@ export const changeMovieStatus = createAsyncThunk<MovieResponse, { id: string; s
 /**
  * Get movie statistics (Admin only)
  */
-export const fetchMovieStats = createAsyncThunk<any, void>(
+export const fetchMovieStats = createAsyncThunk<MovieStatsDto, void>(
     'movies/fetchMovieStats',
     async (_, { rejectWithValue }) => {
         try {

@@ -1,11 +1,19 @@
 import endpoints from '../api/endpoints';
 import httpClient from '../api/httpClient';
-import { RoomSearchParams, RoomResponse, RoomListResponse } from '../../models';
+import type {
+  RoomSearchDto,
+  RoomReadDto,
+  RoomStatsDto,
+  CreateRoomRequest,
+  UpdateRoomRequest,
+  ChangeRoomStatusDto,
+  PagedResult,
+} from '../../models';
 
 /**
  * Fetch rooms list for a cinema
  */
-export async function getRoomsApi(cinemaId: string, params: RoomSearchParams = {}): Promise<RoomListResponse> {
+export async function getRoomsApi(cinemaId: string, params: RoomSearchDto = {}): Promise<PagedResult<RoomReadDto>> {
   const { data } = await httpClient.get(endpoints.rooms.list(cinemaId), { params });
   return data;
 }
@@ -13,7 +21,7 @@ export async function getRoomsApi(cinemaId: string, params: RoomSearchParams = {
 /**
  * Fetch single room detail
  */
-export async function getRoomDetailApi(cinemaId: string, id: string): Promise<RoomResponse> {
+export async function getRoomDetailApi(cinemaId: string, id: string): Promise<RoomReadDto> {
   const { data } = await httpClient.get(endpoints.rooms.detail(cinemaId, id));
   return data;
 }
@@ -21,7 +29,7 @@ export async function getRoomDetailApi(cinemaId: string, id: string): Promise<Ro
 /**
  * Create new room (Admin/Manager only)
  */
-export async function createRoomApi(cinemaId: string, payload: any) {
+export async function createRoomApi(cinemaId: string, payload: CreateRoomRequest): Promise<RoomReadDto> {
   const { data } = await httpClient.post(endpoints.rooms.create(cinemaId), payload);
   return data;
 }
@@ -29,7 +37,7 @@ export async function createRoomApi(cinemaId: string, payload: any) {
 /**
  * Update room (Admin/Manager only)
  */
-export async function updateRoomApi(cinemaId: string, id: string, payload: any) {
+export async function updateRoomApi(cinemaId: string, id: string, payload: UpdateRoomRequest): Promise<RoomReadDto> {
   const { data } = await httpClient.put(endpoints.rooms.update(cinemaId, id), payload);
   return data;
 }
@@ -37,15 +45,14 @@ export async function updateRoomApi(cinemaId: string, id: string, payload: any) 
 /**
  * Delete room (Admin only)
  */
-export async function deleteRoomApi(cinemaId: string, id: string) {
-  const { data } = await httpClient.delete(endpoints.rooms.delete(cinemaId, id));
-  return data;
+export async function deleteRoomApi(cinemaId: string, id: string): Promise<void> {
+  await httpClient.delete(endpoints.rooms.delete(cinemaId, id));
 }
 
 /**
  * Change room status (Admin/Manager only)
  */
-export async function changeRoomStatusApi(cinemaId: string, id: string, payload: any) {
+export async function changeRoomStatusApi(cinemaId: string, id: string, payload: ChangeRoomStatusDto): Promise<RoomReadDto> {
   const { data } = await httpClient.patch(endpoints.rooms.changeStatus(cinemaId, id), payload);
   return data;
 }
@@ -53,7 +60,7 @@ export async function changeRoomStatusApi(cinemaId: string, id: string, payload:
 /**
  * Get room statistics (Admin/Manager only)
  */
-export async function getRoomStatsApi(cinemaId: string, id: string) {
+export async function getRoomStatsApi(cinemaId: string, id: string): Promise<RoomStatsDto> {
   const { data } = await httpClient.get(endpoints.rooms.stats(cinemaId, id));
   return data;
 }

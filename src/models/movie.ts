@@ -72,13 +72,19 @@ export interface UpdateMovieRequest {
   genreIds?: string[];
 }
 
-export interface CreateGenreRequest {
+// Matches CreateGenreDto
+export interface CreateGenreDto {
   name: string;
 }
 
-export interface UpdateGenreRequest {
+// Matches UpdateGenreDto
+export interface UpdateGenreDto {
   name: string;
 }
+
+// Alias for backward compatibility
+export type CreateGenreRequest = CreateGenreDto;
+export type UpdateGenreRequest = UpdateGenreDto;
 
 // API Response types
 export interface MovieResponse {
@@ -100,11 +106,15 @@ export interface MovieResponse {
   genres: Genre[];
 }
 
-export interface GenreResponse {
+// Matches GenreReadDto
+export interface GenreReadDto {
   id: string;
   name: string;
   movieCount: number;
 }
+
+// Alias for backward compatibility
+export type GenreResponse = GenreReadDto;
 
 export interface MovieListResponse {
   items: MovieResponse[];
@@ -114,13 +124,28 @@ export interface MovieListResponse {
   totalPages: number;
 }
 
-// Search and filter types
-export interface MovieSearchParams {
+// Search and filter types - matches MovieSearchDto
+export interface MovieSearchDto {
+  search?: string;
+  genreIds?: string[];
+  status?: MovieStatus;
+  releaseYear?: number;
+  releaseDateFrom?: string;
+  releaseDateTo?: string;
   page?: number;
   pageSize?: number;
-  keyword?: string;
-  genre?: string;
-  status?: MovieStatus;
-  sort?: 'title' | 'releaseDate' | 'createdAt';
-  order?: 'asc' | 'desc';
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
+
+// Matches MovieStatsDto
+export interface MovieStatsDto {
+  totalMovies: number;
+  draftMovies: number;
+  comingSoonMovies: number;
+  nowShowingMovies: number;
+  archivedMovies: number;
+}
+
+// Alias for backward compatibility
+export type MovieSearchParams = MovieSearchDto;

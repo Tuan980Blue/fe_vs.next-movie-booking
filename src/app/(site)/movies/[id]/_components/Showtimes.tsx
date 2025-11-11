@@ -4,13 +4,13 @@ import {motion} from "framer-motion";
 import {useEffect, useMemo, useState} from "react";
 import {getShowtimesByMovieApi} from "@/service";
 import { useRouter } from "next/navigation";
-import type { ShowtimeResponse, ShowtimeListResponse } from "@/models/showtime";
+import type { ShowtimeReadDto } from "@/models/showtime";
 
 const Showtimes = ({ movieId }: { movieId: string }) => {
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
-    const [showtimes, setShowtimes] = useState<ShowtimeResponse[]>([]);
+    const [showtimes, setShowtimes] = useState<ShowtimeReadDto[]>([]);
 
     useEffect(() => {
         let ignore = false;
@@ -19,11 +19,8 @@ const Showtimes = ({ movieId }: { movieId: string }) => {
             try {
                 setLoading(true);
                 setError('');
-                const data: ShowtimeListResponse | unknown[] = await getShowtimesByMovieApi(movieId);
-                const items = Array.isArray(data)
-                    ? data
-                    : (Array.isArray((data as ShowtimeListResponse)?.items) ? (data as ShowtimeListResponse).items : []);
-                if (!ignore) setShowtimes(items);
+                const data: ShowtimeReadDto[] = await getShowtimesByMovieApi(movieId);
+                if (!ignore) setShowtimes(Array.isArray(data) ? data : []);
             } catch (e: unknown) {
                 if (!ignore) setError(e instanceof Error ? e.message : 'Không thể tải lịch chiếu');
             } finally {
@@ -35,7 +32,7 @@ const Showtimes = ({ movieId }: { movieId: string }) => {
     }, [movieId]);
 
     const groups = useMemo(() => {
-        const byDate = new Map<string, ShowtimeResponse[]>();
+        const byDate = new Map<string, ShowtimeReadDto[]>();
         const today = new Date();
         const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         for (const s of showtimes) {

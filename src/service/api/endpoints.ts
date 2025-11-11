@@ -15,6 +15,7 @@ const endpoints = {
     updateProfile: '/users/me',
     list: '/users',
     detail: (id: string) => `/users/${id}`,
+    assignAdmin: (id: string) => `/users/${id}/assign-admin`,
   },
   
   // Movie endpoints
@@ -85,40 +86,55 @@ const endpoints = {
     delete: (id: string) => `/showtimes/${id}`,
   },
   
+  // Seat Lock endpoints
+  seatLocks: {
+    lock: '/seat-locks/lock',
+    unlock: '/seat-locks/unlock',
+    changeTtl: '/seat-locks/change-ttl',
+    getLockedSeats: (showtimeId: string) => `/seat-locks/showtime/${showtimeId}`,
+  },
+  
   // Price Rule endpoints
   priceRules: {
-    list: '/pricerules',
-    detail: (id: string) => `/pricerules/${id}`,
-    create: '/pricerules',
-    update: (id: string) => `/pricerules/${id}`,
-    delete: (id: string) => `/pricerules/${id}`,
+    list: '/price-rules',
+    detail: (id: string) => `/price-rules/${id}`,
+    create: '/price-rules',
+    update: (id: string) => `/price-rules/${id}`,
+    delete: (id: string) => `/price-rules/${id}`,
   },
   
-  // Pricing endpoints
-  pricing: {
-    quote: '/pricing/quote',
+  // Price Calculation endpoints
+  priceCalculation: {
+    calculate: '/price-calculation/calculate',
   },
   
-  // Booking endpoints (to be implemented)
+  // Booking endpoints
   bookings: {
     list: '/bookings',
+    me: '/bookings/me',
     detail: (id: string) => `/bookings/${id}`,
+    byCode: (code: string) => `/bookings/code/${code}`,
     create: '/bookings',
-    update: (id: string) => `/bookings/${id}`,
-    cancel: (id: string) => `/bookings/${id}/cancel`,
     confirm: (id: string) => `/bookings/${id}/confirm`,
+    cancel: (id: string) => `/bookings/${id}/cancel`,
   },
   
-  // Payment endpoints (to be implemented)
+  // Payment endpoints
   payments: {
     list: '/payments',
     detail: (id: string) => `/payments/${id}`,
     create: '/payments',
-    process: (id: string) => `/payments/${id}/process`,
-    refund: (id: string) => `/payments/${id}/refund`,
+    vnpayReturn: '/payments/vnpay-return',
+    vnpayIpn: '/payments/vnpay-ipn',
   },
   
-  // Promotion endpoints (to be implemented)
+  // Ticket endpoints
+  tickets: {
+    verifyQr: (qrCode: string) => `/tickets/qr/${qrCode}`,
+    checkIn: (bookingCode: string) => `/tickets/${bookingCode}/checkin`,
+  },
+  
+  // Promotion endpoints (to be implemented when backend is ready)
   promotions: {
     list: '/promotions',
     detail: (id: string) => `/promotions/${id}`,

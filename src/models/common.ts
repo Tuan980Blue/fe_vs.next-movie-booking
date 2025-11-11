@@ -16,11 +16,16 @@ export interface PaginationParams {
   order?: 'asc' | 'desc';
 }
 
-export interface PaginatedResponse<T> {
+// Matches PagedResult<T> from backend
+export interface PagedResult<T> {
   items: T[];
   page: number;
   pageSize: number;
   totalItems: number;
+}
+
+// Extended pagination with calculated fields
+export interface PaginatedResponse<T> extends PagedResult<T> {
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;

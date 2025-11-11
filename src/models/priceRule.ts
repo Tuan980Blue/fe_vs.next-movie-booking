@@ -20,21 +20,46 @@ export interface PriceRule {
   updatedAt?: string;
 }
 
-// DTOs for API requests
-export interface CreatePriceRuleRequest {
-  cinemaId?: string;
-  dayType: DayType;
-  seatType: number;
+// DTOs for API requests - matches PriceRuleCreateDto
+export interface PriceRuleCreateDto {
+  seatType: number; // SeatType enum value
   priceMinor: number;
   isActive?: boolean;
 }
 
-export interface UpdatePriceRuleRequest {
-  cinemaId?: string;
-  dayType?: DayType;
-  seatType?: number;
-  priceMinor?: number;
+// Matches PriceRuleUpdateDto
+export interface PriceRuleUpdateDto {
+  id: string;
+  seatType: number; // SeatType enum value
+  priceMinor: number;
   isActive?: boolean;
+}
+
+// Matches PriceRuleSearchDto
+export interface PriceRuleSearchDto {
+  seatType?: number; // SeatType enum value
+  isActive?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
+// Matches PricingQuoteRequestDto
+export interface PricingQuoteRequestDto {
+  seatIds: string[];
+}
+
+// Matches PricingQuoteItemDto
+export interface PricingQuoteItemDto {
+  seatId: string;
+  seatType: number; // SeatType enum value
+  priceMinor: number;
+}
+
+// Matches PricingQuoteResponseDto
+export interface PricingQuoteResponseDto {
+  quotes: PricingQuoteItemDto[];
+  totalAmountMinor: number;
+  currency: string;
 }
 
 export interface BulkUpdatePriceRulesRequest {
@@ -48,22 +73,18 @@ export interface BulkUpdatePriceRulesRequest {
   }[];
 }
 
-// API Response types
-export interface PriceRuleResponse {
+// API Response types - matches PriceRuleResponseDto
+export interface PriceRuleResponseDto {
   id: string;
-  cinemaId?: string;
-  cinema?: {
-    id: string;
-    name: string;
-    city: string;
-  };
-  dayType: DayType;
-  seatType: number;
+  seatType: number; // SeatType enum value
   priceMinor: number;
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;
 }
+
+// Alias for backward compatibility
+export type PriceRuleResponse = PriceRuleResponseDto;
 
 export interface PriceRuleListResponse {
   items: PriceRuleResponse[];

@@ -7,7 +7,7 @@ import {
     UpdateMovieRequest,
     MovieResponse,
     MovieStatus,
-    MovieSearchParams
+    MovieSearchDto
 } from '@/models/movie';
 import MovieStats from './_components/MovieStats';
 import MovieModal from './_components/MovieModal';
@@ -44,13 +44,13 @@ export default function ManageMovies() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [movieToDelete, setMovieToDelete] = useState<MovieResponse | null>(null);
-    const [searchParams, setSearchParams] = useState<MovieSearchParams>({
+    const [searchParams, setSearchParams] = useState<MovieSearchDto>({
         page: 1,
         pageSize: 20,
-        keyword: '',
+        search: '',
         status: undefined,
-        sort: 'createdAt',
-        order: 'desc'
+        sortBy: 'createdAt',
+        sortDirection: 'desc'
     });
 
     // Load initial data
@@ -146,8 +146,8 @@ export default function ManageMovies() {
     };
 
     // Handle search
-    const handleSearch = (keyword: string) => {
-        setSearchParams(prev => ({...prev, keyword, page: 1}));
+    const handleSearch = (search: string) => {
+        setSearchParams(prev => ({...prev, search, page: 1}));
     };
 
     // Handle status filter
@@ -233,7 +233,7 @@ export default function ManageMovies() {
                             <input
                                 type="text"
                                 placeholder="Search movies..."
-                                value={searchParams.keyword || ''}
+                                value={searchParams.search || ''}
                                 onChange={(e) => handleSearch(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
@@ -457,7 +457,7 @@ export default function ManageMovies() {
                     <div className="text-gray-400 text-6xl mb-4">🎬</div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No movies found</h3>
                     <p className="text-gray-500 mb-4">
-                        {searchParams.keyword || searchParams.status !== undefined
+                        {searchParams.search || searchParams.status !== undefined
                             ? 'Try adjusting your search criteria'
                             : 'Get started by creating your first movie'}
                     </p>

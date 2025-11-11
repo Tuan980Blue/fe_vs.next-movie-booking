@@ -22,6 +22,12 @@ export * from './seat';
 // Booking and ticket management
 export * from './booking';
 
+// Ticket management
+export * from './ticket';
+
+// Seat lock management
+export * from './seatLock';
+
 // Payment management
 export * from './payment';
 

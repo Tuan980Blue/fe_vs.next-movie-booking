@@ -1,11 +1,17 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
+import type {
+  PriceRuleSearchDto,
+  PriceRuleResponseDto,
+  PriceRuleCreateDto,
+  PriceRuleUpdateDto,
+  PagedResult,
+} from '../../models';
 
 /**
  * Fetch paginated list of price rules
- * params can include: page, pageSize, cinemaId, dayType, seatType, isActive
  */
-export async function getPriceRulesApi(params = {}) {
+export async function getPriceRulesApi(params: PriceRuleSearchDto = {}): Promise<PagedResult<PriceRuleResponseDto>> {
   const { data } = await httpClient.get(endpoints.priceRules.list, { params });
   return data;
 }
@@ -13,7 +19,7 @@ export async function getPriceRulesApi(params = {}) {
 /**
  * Fetch single price rule detail
  */
-export async function getPriceRuleDetailApi(id: string) {
+export async function getPriceRuleDetailApi(id: string): Promise<PriceRuleResponseDto> {
   const { data } = await httpClient.get(endpoints.priceRules.detail(id));
   return data;
 }
@@ -21,7 +27,7 @@ export async function getPriceRuleDetailApi(id: string) {
 /**
  * Create new price rule (Admin/Manager only)
  */
-export async function createPriceRuleApi(payload: any) {
+export async function createPriceRuleApi(payload: PriceRuleCreateDto): Promise<PriceRuleResponseDto> {
   const { data } = await httpClient.post(endpoints.priceRules.create, payload);
   return data;
 }
@@ -29,7 +35,7 @@ export async function createPriceRuleApi(payload: any) {
 /**
  * Update price rule (Admin/Manager only)
  */
-export async function updatePriceRuleApi(id: string, payload: any) {
+export async function updatePriceRuleApi(id: string, payload: PriceRuleUpdateDto): Promise<PriceRuleResponseDto> {
   const { data } = await httpClient.put(endpoints.priceRules.update(id), payload);
   return data;
 }
@@ -37,7 +43,6 @@ export async function updatePriceRuleApi(id: string, payload: any) {
 /**
  * Delete price rule (Admin/Manager only)
  */
-export async function deletePriceRuleApi(id: string) {
-  const { data } = await httpClient.delete(endpoints.priceRules.delete(id));
-  return data;
+export async function deletePriceRuleApi(id: string): Promise<void> {
+  await httpClient.delete(endpoints.priceRules.delete(id));
 }

@@ -7,7 +7,7 @@ import {useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import MoviesShowcaseSkeleton from "@/app/(site)/_components/MoviesShowcaseSkeleton";
 import {getMoviesApi} from "@/service";
-import { MovieStatus, type MovieResponse, type MovieSearchParams } from "@/models/movie";
+import { MovieStatus, type MovieResponse, type MovieSearchDto } from "@/models/movie";
 import MovieCard from "@/components/ui/MovieCard";
 
 interface TabButtonProps {
@@ -39,7 +39,7 @@ const MoviesShowcase: React.FC = () => {
     const [error, setError] = useState<string>('');
     const [startIndex, setStartIndex] = useState<number>(0); // sliding window start
 
-    const params = useMemo<MovieSearchParams>(() => {
+    const params = useMemo<MovieSearchDto>(() => {
         const status = tab === 'NowShowing' ? MovieStatus.NowShowing : MovieStatus.ComingSoon;
         return { status };
     }, [tab]);

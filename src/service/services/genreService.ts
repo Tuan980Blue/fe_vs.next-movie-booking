@@ -1,10 +1,15 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
+import type {
+  GenreReadDto,
+  CreateGenreDto,
+  UpdateGenreDto,
+} from '../../models';
 
 /**
  * Fetch all genres
  */
-export async function getGenresApi() {
+export async function getGenresApi(): Promise<GenreReadDto[]> {
   const { data } = await httpClient.get(endpoints.genres.list);
   return data;
 }
@@ -12,7 +17,7 @@ export async function getGenresApi() {
 /**
  * Fetch single genre detail
  */
-export async function getGenreDetailApi(id: string) {
+export async function getGenreDetailApi(id: string): Promise<GenreReadDto> {
   const { data } = await httpClient.get(endpoints.genres.detail(id));
   return data;
 }
@@ -20,7 +25,7 @@ export async function getGenreDetailApi(id: string) {
 /**
  * Create new genre (Admin only)
  */
-export async function createGenreApi(payload: any) {
+export async function createGenreApi(payload: CreateGenreDto): Promise<GenreReadDto> {
   const { data } = await httpClient.post(endpoints.genres.create, payload);
   return data;
 }
@@ -28,7 +33,7 @@ export async function createGenreApi(payload: any) {
 /**
  * Update genre (Admin only)
  */
-export async function updateGenreApi(id: string, payload: any) {
+export async function updateGenreApi(id: string, payload: UpdateGenreDto): Promise<GenreReadDto> {
   const { data } = await httpClient.put(endpoints.genres.update(id), payload);
   return data;
 }
@@ -36,7 +41,6 @@ export async function updateGenreApi(id: string, payload: any) {
 /**
  * Delete genre (Admin only)
  */
-export async function deleteGenreApi(id: string) {
-  const { data } = await httpClient.delete(endpoints.genres.delete(id));
-  return data;
+export async function deleteGenreApi(id: string): Promise<void> {
+  await httpClient.delete(endpoints.genres.delete(id));
 }

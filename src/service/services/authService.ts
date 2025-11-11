@@ -2,7 +2,7 @@
 // Giải mã payload của JWT (không verify chữ ký; chỉ để đọc claim)
 import endpoints from '../api/endpoints';
 import httpClient from '../api/httpClient';
-import { LoginRequest, RegisterRequest, User, UserResponse } from '../../models/user';
+import { LoginRequest, RegisterRequest, User, UserResponse, UserStatus } from '../../models/user';
 import { setAccessToken, clearAccessToken } from '@/service/auth/cookie';
 import { getOrCreateDeviceId, getUserAgent } from '@/service/auth/device';
 
@@ -16,7 +16,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-export async function loginApi({ email, password }: LoginRequest) {
+export async function loginApi({ email, password }: LoginRequest): Promise<{ accessToken: string; accessTokenExpiresAt: string }> {
   const url = endpoints.auth.login;
   const deviceId = getOrCreateDeviceId();
   const userAgent = getUserAgent();
@@ -27,7 +27,7 @@ export async function loginApi({ email, password }: LoginRequest) {
   return data;
 }
 
-export async function registerApi({ email, password, fullName }: RegisterRequest) {
+export async function registerApi({ email, password, fullName }: RegisterRequest): Promise<{ accessToken: string; accessTokenExpiresAt: string }> {
   const url = endpoints.auth.register;
   const { data } = await httpClient.post(url, { email, password, fullName });
   if (data?.accessToken) {
@@ -36,11 +36,21 @@ export async function registerApi({ email, password, fullName }: RegisterRequest
   return data;
 }
 
-export async function logoutApi() {
-  const url = endpoints.auth.logout;
-  const { data } = await httpClient.post(url, {});
-  clearAccessToken();
+export async function refreshTokenApi(): Promise<{ accessToken: string; accessTokenExpiresAt: string }> {
+  const url = endpoints.auth.refresh;
+  const deviceId = getOrCreateDeviceId();
+  const userAgent = getUserAgent();
+  const { data } = await httpClient.post(url, { deviceId, userAgent });
+  if (data?.accessToken) {
+    setAccessToken(data.accessToken);
+  }
   return data;
+}
+
+export async function logoutApi(deviceId?: string): Promise<void> {
+  const url = endpoints.auth.logout;
+  await httpClient.post(url, deviceId ? { deviceId } : {});
+  clearAccessToken();
 }
 
 export function parseUserFromAccessToken(accessToken: string): User | null {
@@ -85,10 +95,22 @@ export function parseUserFromAccessToken(accessToken: string): User | null {
   return user;
 }
 
-export async function getMeApi() {
-  const url = endpoints.users.me;
-  const { data } = await httpClient.get(url);
-  return data;
+// Note: getMeApi is exported from userService.ts to avoid duplicate exports
+
+/**
+ * Convert string status from backend to UserStatus enum
+ */
+function mapStatusToUserStatus(status: string): UserStatus {
+  switch (status.toLowerCase()) {
+    case 'active':
+      return UserStatus.Active;
+    case 'inactive':
+      return UserStatus.Inactive;
+    case 'banned':
+      return UserStatus.Banned;
+    default:
+      return UserStatus.Active; // Default to Active
+  }
 }
 
 export function mapMeResponseToUser(me: UserResponse | null): User | null {
@@ -104,7 +126,7 @@ export function mapMeResponseToUser(me: UserResponse | null): User | null {
     email: me.email,
     fullName: me.fullName,
     phone: me.phone || '',
-    status: me.status,
+    status: mapStatusToUserStatus(me.status),
     createdAt: me.createdAt,
     updatedAt: me.updatedAt,
     roles,

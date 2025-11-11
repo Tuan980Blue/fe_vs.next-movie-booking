@@ -31,66 +31,126 @@ export interface Seat {
   updatedBy?: string;      // User cập nhật ghế
 }
 
-// DTOs for API requests
-export interface CreateSeatRequest {
-  roomId: string;
+// DTOs for API requests - matches CreateSeatDto
+export interface CreateSeatDto {
   rowLabel: string;
   seatNumber: number;
+  seatType: string; // "Standard", "Vip", "Couple", "Accessible"
+  isActive?: boolean;
   positionX?: number;
   positionY?: number;
-  seatType?: SeatType;
-  isActive?: boolean;
   specialNotes?: string;
 }
 
-export interface UpdateSeatRequest {
+// Matches UpdateSeatDto
+export interface UpdateSeatDto {
+  rowLabel: string;
+  seatNumber: number;
+  seatType: string;
+  isActive: boolean;
+  positionX?: number;
+  positionY?: number;
+  specialNotes?: string;
+}
+
+// Matches CreateSeatLayoutDto
+export interface CreateSeatLayoutDto {
+  rows: number;
+  seatsPerRow: number;
+  rowStartLabel?: string;
+  defaultSeatType: string;
+  startPositionX?: number;
+  startPositionY?: number;
+  seatSpacingX?: number;
+  seatSpacingY?: number;
+  coupleRows?: string[];
+  coupleSpacingY?: number;
+  coupleSpacingX?: number;
+}
+
+// Matches SeatSearchDto
+export interface SeatSearchDto {
   rowLabel?: string;
   seatNumber?: number;
-  positionX?: number;
-  positionY?: number;
-  seatType?: SeatType;
+  seatType?: string;
   isActive?: boolean;
-  specialNotes?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
-export interface CreateMultipleSeatsRequest {
-  roomId: string;
-  seats: {
-    rowLabel: string;
-    seatNumber: number;
-    positionX?: number;
-    positionY?: number;
-    seatType?: SeatType;
-    isActive?: boolean;
-    specialNotes?: string;
-  }[];
-}
-
-// API Response types
-export interface SeatResponse {
+// API Response types - matches SeatReadDto
+export interface SeatReadDto {
   id: string;
   roomId: string;
-  room?: {
-    id: string;
-    name: string;
-    code: string;
-    cinema: {
-      id: string;
-      name: string;
-    };
-  };
   rowLabel: string;
   seatNumber: number;
+  seatType: string; // "Standard", "Vip", "Couple", "Accessible"
+  isActive: boolean;
   positionX?: number;
   positionY?: number;
-  seatType: SeatType;
-  isActive: boolean;
   specialNotes?: string;
   createdAt: string;
   updatedAt?: string;
-  isAvailable?: boolean; // For showtime-specific availability
-  priceMinor?: number;   // For showtime-specific pricing
 }
+
+// Matches SeatListDto
+export interface SeatListDto {
+  id: string;
+  rowLabel: string;
+  seatNumber: number;
+  seatType: string;
+  isActive: boolean;
+  positionX?: number;
+  positionY?: number;
+  specialNotes?: string;
+}
+
+// Matches SeatLayoutDto
+export interface SeatLayoutDto {
+  roomId: string;
+  roomName: string;
+  rows: SeatRowDto[];
+  seatTypes: SeatTypeInfoDto[];
+  screenPosition: string;
+}
+
+// Matches SeatRowDto
+export interface SeatRowDto {
+  rowLabel: string;
+  seats: SeatDto[];
+}
+
+// Matches SeatDto (in layout)
+export interface SeatDto {
+  id: string;
+  rowLabel: string;
+  seatNumber: number;
+  seatType: string;
+  isActive: boolean;
+  positionX?: number;
+  positionY?: number;
+  specialNotes?: string;
+}
+
+// Matches SeatTypeInfoDto
+export interface SeatTypeInfoDto {
+  type: string;
+  name: string;
+  color: string;
+  description: string;
+}
+
+// Matches SeatStatsDto
+export interface SeatStatsDto {
+  totalSeats: number;
+  activeSeats: number;
+  seatsByType: Record<string, number>;
+}
+
+// Alias for backward compatibility
+export type SeatResponse = SeatReadDto;
 
 export interface SeatLayoutResponse {
   roomId: string;

@@ -1,28 +1,58 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
-import {ApiResponse, ShowtimeListResponse, ShowtimeReadDto, ShowtimeSearchParams} from "@/models";
+import type {
+  ShowtimeReadDto,
+  ShowtimeSearchDto,
+  CreateShowtimeDto,
+  UpdateShowtimeDto,
+  PagedResult,
+} from '../../models';
+
+/**
+ * Fetch paginated list of showtimes
+ */
+export async function getShowtimesApi(params: ShowtimeSearchDto = {}): Promise<PagedResult<ShowtimeReadDto>> {
+  const { data } = await httpClient.get(endpoints.showtimes.list, { params });
+  return data;
+}
 
 /**
  * Fetch showtime detail by ID
- * Returns a single showtime with all details
  */
 export async function getShowtimeByIdApi(id: string): Promise<ShowtimeReadDto> {
   const { data } = await httpClient.get(endpoints.showtimes.detail(id));
-  // Support both raw response and ApiResponse wrapper
-  const wrapped = data as ApiResponse<ShowtimeReadDto>;
-  const isWrapped = typeof wrapped === 'object' && wrapped !== null && 'success' in wrapped && 'data' in wrapped;
-  return (isWrapped ? wrapped.data : data) as ShowtimeReadDto;
+  return data;
 }
 
 /**
  * Fetch showtimes for a specific movie
  */
-export async function getShowtimesByMovieApi(movieId: string, params: ShowtimeSearchParams = {}): Promise<ShowtimeListResponse> {
-  const { data } = await httpClient.get(endpoints.showtimes.byMovie(movieId), { params });
-  // Support both raw paginated response and ApiResponse wrapper
-  const wrapped = data as ApiResponse<ShowtimeListResponse>;
-  const isWrapped = typeof wrapped === 'object' && wrapped !== null && 'success' in wrapped && 'data' in wrapped;
-  return (isWrapped ? wrapped.data : data) as ShowtimeListResponse;
+export async function getShowtimesByMovieApi(movieId: string): Promise<ShowtimeReadDto[]> {
+  const { data } = await httpClient.get(endpoints.showtimes.byMovie(movieId));
+  return data;
+}
+
+/**
+ * Create new showtime (Admin/Manager only)
+ */
+export async function createShowtimeApi(payload: CreateShowtimeDto): Promise<ShowtimeReadDto> {
+  const { data } = await httpClient.post(endpoints.showtimes.create, payload);
+  return data;
+}
+
+/**
+ * Update showtime (Admin/Manager only)
+ */
+export async function updateShowtimeApi(id: string, payload: UpdateShowtimeDto): Promise<ShowtimeReadDto> {
+  const { data } = await httpClient.put(endpoints.showtimes.update(id), payload);
+  return data;
+}
+
+/**
+ * Delete showtime (Admin only)
+ */
+export async function deleteShowtimeApi(id: string): Promise<void> {
+  await httpClient.delete(endpoints.showtimes.delete(id));
 }
 
 
