@@ -83,8 +83,8 @@ export interface UpdateGenreDto {
 }
 
 // Alias for backward compatibility
-export interface CreateGenreRequest extends CreateGenreDto {}
-export interface UpdateGenreRequest extends UpdateGenreDto {}
+export type CreateGenreRequest = CreateGenreDto;
+export type UpdateGenreRequest = UpdateGenreDto;
 
 // API Response types
 export interface MovieResponse {
@@ -114,7 +114,7 @@ export interface GenreReadDto {
 }
 
 // Alias for backward compatibility
-export interface GenreResponse extends GenreReadDto {}
+export type GenreResponse = GenreReadDto;
 
 export interface MovieListResponse {
   items: MovieResponse[];
@@ -148,4 +148,4 @@ export interface MovieStatsDto {
 }
 
 // Alias for backward compatibility
-export interface MovieSearchParams extends MovieSearchDto {}
+export type MovieSearchParams = MovieSearchDto;

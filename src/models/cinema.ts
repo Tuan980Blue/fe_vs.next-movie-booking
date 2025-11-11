@@ -116,7 +116,7 @@ export interface ChangeCinemaStatusDto {
 }
 
 // Alias for backward compatibility
-export interface CinemaResponse extends CinemaReadDto {}
+export type CinemaResponse = CinemaReadDto;
 
 // Matches RoomReadDto
 export interface RoomReadDto {
@@ -165,7 +165,7 @@ export interface ChangeRoomStatusDto {
 }
 
 // Alias for backward compatibility
-export interface RoomResponse extends RoomReadDto {}
+export type RoomResponse = RoomReadDto;
 
 export interface RoomListResponse {
   items: RoomResponse[];
