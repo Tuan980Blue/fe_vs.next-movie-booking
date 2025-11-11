@@ -3,14 +3,14 @@
 
 import {motion} from "framer-motion";
 import Link from "next/link";
-import {useEffect, useMemo, useState} from "react";
+import {Suspense, useEffect, useMemo, useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {getBookingDetailApi, vnpayReturnApi, getPaymentDetailApi} from "@/service";
 import {PaymentStatus} from "@/models/payment";
 import {BookingStatus} from "@/models/booking";
 import type {BookingResponseDto} from "@/models/booking";
 
-const BookingCompletePage = () => {
+const BookingCompleteContent = () => {
     const [showConfetti, setShowConfetti] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -314,6 +314,14 @@ const BookingCompletePage = () => {
                 </motion.div>
             </div>
         </div>
+    );
+};
+
+const BookingCompletePage = () => {
+    return (
+        <Suspense fallback={<div className="py-8 px-4 lg:px-8 min-h-screen">Đang tải thông tin đặt vé...</div>}>
+            <BookingCompleteContent/>
+        </Suspense>
     );
 };
 

@@ -1,14 +1,14 @@
 
 "use client"
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getBookingDetailApi, createPaymentApi } from '@/service';
 import type { BookingResponseDto } from '@/models/booking';
 import {PaymentProvider} from "@/models";
 
-const ConfirmBookingPage = () => {
+const ConfirmBookingContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const bookingId = searchParams.get('bookingId');
@@ -166,4 +166,12 @@ const ConfirmBookingPage = () => {
     );
 };
 
-export default ConfirmBookingPage;
+const ConfirmBookingPage = () => {
+    return (
+        <Suspense fallback={<div className="py-8 px-4 lg:px-8 min-h-screen">Đang tải thông tin đặt vé...</div>}>
+            <ConfirmBookingContent/>
+        </Suspense>
+    );
+};
+
+export default ConfirmBookingPage; 
