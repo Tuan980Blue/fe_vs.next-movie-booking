@@ -3,10 +3,22 @@
 
 import {motion} from "framer-motion";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {useSearchParams} from "next/navigation";
+import {getBookingDetailApi, vnpayReturnApi, getPaymentDetailApi} from "@/service";
+import {PaymentStatus} from "@/models/payment";
+import {BookingStatus} from "@/models/booking";
+import type {BookingResponseDto} from "@/models/booking";
 
 const BookingCompletePage = () => {
     const [showConfetti, setShowConfetti] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [booking, setBooking] = useState<BookingResponseDto | null>(null);
+    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
+    const searchParams = useSearchParams();
+    const bookingId = searchParams.get('bookingId');
+    const paymentId = searchParams.get('paymentId');
 
     useEffect(() => {
         setShowConfetti(true);
@@ -15,16 +27,74 @@ const BookingCompletePage = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const bookingDetails = {
-        movieTitle: "Avengers: Endgame",
-        showtime: "20:00 - 22:30",
-        date: "Thứ 7, 15/12/2024",
-        seats: ["A5", "A6"],
-        cinema: "TA MEM CINEMA - Quận 1",
-        room: "Phòng chiếu VIP",
-        totalPrice: "180,000đ",
-        bookingCode: "TM20241215001"
-    };
+    useEffect(() => {
+        let ignore = false;
+        async function run() {
+            if (!bookingId) return;
+            try {
+                setLoading(true);
+                setError('');
+                // VNPay return: call backend to validate return params
+                const params = Object.fromEntries(searchParams.entries());
+                const hasVnpParams = Object.keys(params).some(k => k.toLowerCase().startsWith('vnp_'));
+                if (hasVnpParams) {
+                    try {
+                        await vnpayReturnApi(params as Record<string, string>);
+                    } catch {
+                        setError('Không thể xác thực phản hồi từ VNPay.');
+                    }
+                } else if (paymentId) {
+                    // For other providers, read payment status if present
+                    try {
+                        const p = await getPaymentDetailApi(paymentId);
+                        setPaymentStatus(p.status);
+                    } catch {
+                        // ignore
+                    }
+                }
+                const data = await getBookingDetailApi(bookingId);
+                if (!ignore) setBooking(data);
+                if (data?.status !== undefined && data.status !== BookingStatus.Confirmed) {
+                    if (!hasVnpParams && !paymentId) {
+                        setError('Đang chờ xác nhận thanh toán. Vui lòng chờ trong giây lát.');
+                    }
+                }
+            } catch (e: unknown) {
+                if (!ignore) setError(e instanceof Error ? e.message : 'Không thể tải thông tin vé');
+            } finally {
+                if (!ignore) setLoading(false);
+            }
+        }
+        run();
+        return () => {
+            ignore = true;
+        };
+    }, [bookingId, paymentId, searchParams]);
+
+    const formatVnd = (amount: number) =>
+        (amount || 0).toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+
+    const bookingDetails = useMemo(() => {
+        const first = booking?.items?.[0];
+        return {
+            movieTitle: first?.showtime?.movieTitle || '',
+            showtime: first ? `${new Date(first.showtime.startUtc).toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+            })} - ${new Date(first.showtime.endUtc).toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}` : '',
+            date: first ? new Date(first.showtime.startUtc).toLocaleDateString('vi-VN', {
+                weekday: 'short',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }) : '',
+            seats: booking?.items?.map(i => `${i.seat.rowLabel}${String(i.seat.seatNumber).padStart(2, '0')}`) || [],
+            cinema: first?.showtime?.cinemaName || '',
+            room: first?.showtime?.roomName || '',
+            totalPrice: formatVnd(booking?.totalAmountMinor || 0),
+            bookingCode: booking?.code || ''
+        };
+    }, [booking]);
 
     return (
         <div className="min-h-screen py-8 px-4 lg:px-8">
@@ -56,6 +126,18 @@ const BookingCompletePage = () => {
             )}
 
             <div className="max-w-4xl mx-auto">
+                {!!error && (
+                    <div className="mb-4 rounded-xl p-4 bg-red-50 text-red-600">
+                        {error}
+                        {bookingId && (
+                            <div className="mt-2">
+                                <Link href={`/booking/payment?bookingId=${encodeURIComponent(bookingId)}`} className="underline text-red-600">
+                                    Thử thanh toán lại
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                )}
                 {/* Success Animation */}
                 <motion.div
                     className="text-center mb-6"
@@ -117,7 +199,7 @@ const BookingCompletePage = () => {
                                 <span className="text-xl font-bold">Thông tin vé</span>
                             </div>
                             <div className="text-white/90 text-sm font-medium">
-                                Mã đặt vé: {bookingDetails.bookingCode}
+                                Mã đặt vé: {bookingDetails.bookingCode || '—'}
                             </div>
                         </div>
                     </div>
