@@ -1,4 +1,6 @@
 // Booking related types and enums
+import {TicketResponseDto} from "@/models/ticket";
+
 export enum BookingStatus {
   Pending = 1,
   Confirmed = 2,
@@ -227,16 +229,5 @@ export interface SeatInfoDto {
   seatType: number; // SeatType enum value
 }
 
-// Matches TicketResponseDto from backend
-export interface TicketResponseDto {
-  id: string;
-  ticketCode: string;
-  ticketQr?: string;
-  showtimeId: string;
-  seatId: string;
-  status: TicketStatus;
-  issuedAt: string;
-  checkedInAt?: string;
-  checkedInBy?: string;
-}
+// TicketResponseDto is now exported from './ticket' to avoid duplication
 

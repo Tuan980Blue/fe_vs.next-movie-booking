@@ -1,8 +1,8 @@
 // Ticket related types - matches backend TicketDtos
-import { TicketStatus } from './booking';
+import { TicketStatus, ShowtimeInfoDto, SeatInfoDto, CustomerInfoDto } from './booking';
 
 // Re-export types from booking for convenience
-export type { ShowtimeInfoDto, SeatInfoDto, CustomerInfoDto } from './booking';
+export type { ShowtimeInfoDto, SeatInfoDto, CustomerInfoDto };
 
 // Matches TicketResponseDto
 export interface TicketResponseDto {
