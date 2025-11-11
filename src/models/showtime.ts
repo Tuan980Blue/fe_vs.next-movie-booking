@@ -58,7 +58,7 @@ export interface UpdateShowtimeRequest {
   basePriceMinor?: number;
 }
 
-// Backend response type (flattened structure from ShowtimeReadDto)
+// Backend response type - matches ShowtimeReadDto exactly
 export interface ShowtimeReadDto {
   id: string;
   movieId: string;
@@ -78,6 +78,45 @@ export interface ShowtimeReadDto {
   format: string; // "TwoD", "ThreeD", "Imax"
   basePriceMinor: number;
   createdAt: string;
+}
+
+// Matches ShowtimeSearchDto
+export interface ShowtimeSearchDto {
+  movieId?: string;
+  cinemaId?: string;
+  roomId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  language?: string;
+  format?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+// Matches CreateShowtimeDto
+export interface CreateShowtimeDto {
+  movieId: string;
+  roomId: string;
+  startUtc: string;
+  endUtc: string;
+  language?: string;
+  subtitle?: boolean;
+  format?: string;
+  basePriceMinor: number;
+}
+
+// Matches UpdateShowtimeDto
+export interface UpdateShowtimeDto {
+  movieId: string;
+  roomId: string;
+  startUtc: string;
+  endUtc: string;
+  language?: string;
+  subtitle?: boolean;
+  format?: string;
+  basePriceMinor: number;
 }
 
 // API Response types

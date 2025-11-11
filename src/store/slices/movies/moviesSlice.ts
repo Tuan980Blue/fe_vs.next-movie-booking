@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   MovieResponse, 
-  MovieSearchParams,
+  MovieSearchDto,
 } from '@/models/movie'
 import { MoviesState } from './moviesTypes'
 import {changeMovieStatus, createMovie, deleteMovie, fetchMovies, fetchMovieStats, updateMovie} from './moviesThunks'
@@ -51,7 +51,7 @@ const moviesSlice = createSlice({
             .addCase(fetchMovies.pending, (state, action) => {
                 state.loading = true
                 state.error = null
-                state.lastQuery = (action.meta.arg as MovieSearchParams | undefined) ?? null
+                state.lastQuery = (action.meta.arg as MovieSearchDto | undefined) ?? null
                 //meta là nơi Redux Toolkit lưu thông tin phụ (metadata) của action.
                 // arg chính là tham số bạn truyền cho thunk khi dispatch.
             })
@@ -61,7 +61,8 @@ const moviesSlice = createSlice({
                 state.page = action.payload.page
                 state.pageSize = action.payload.pageSize
                 state.totalItems = action.payload.totalItems
-                state.totalPages = action.payload.totalPages
+                // Calculate totalPages from totalItems and pageSize
+                state.totalPages = state.pageSize > 0 ? Math.ceil(state.totalItems / state.pageSize) : 0
                 console.log("State", state)
                 console.log("ACTION", action)
             })

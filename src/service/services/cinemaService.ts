@@ -1,11 +1,19 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
+import type {
+  CinemaSearchDto,
+  CinemaReadDto,
+  CinemaStatsDto,
+  CreateCinemaRequest,
+  UpdateCinemaRequest,
+  ChangeCinemaStatusDto,
+  PagedResult,
+} from '../../models';
 
 /**
  * Fetch paginated list of cinemas
- * params can include: page, pageSize, search, city, status
  */
-export async function getCinemasApi(params = {}) {
+export async function getCinemasApi(params: CinemaSearchDto = {}): Promise<PagedResult<CinemaReadDto>> {
   const { data } = await httpClient.get(endpoints.cinemas.list, { params });
   return data;
 }
@@ -13,7 +21,7 @@ export async function getCinemasApi(params = {}) {
 /**
  * Fetch single cinema detail
  */
-export async function getCinemaDetailApi(id: string) {
+export async function getCinemaDetailApi(id: string): Promise<CinemaReadDto> {
   const { data } = await httpClient.get(endpoints.cinemas.detail(id));
   return data;
 }
@@ -21,7 +29,7 @@ export async function getCinemaDetailApi(id: string) {
 /**
  * Create new cinema (Admin/Manager only)
  */
-export async function createCinemaApi(payload: any) {
+export async function createCinemaApi(payload: CreateCinemaRequest): Promise<CinemaReadDto> {
   const { data } = await httpClient.post(endpoints.cinemas.create, payload);
   return data;
 }
@@ -29,7 +37,7 @@ export async function createCinemaApi(payload: any) {
 /**
  * Update cinema (Admin/Manager only)
  */
-export async function updateCinemaApi(id: string, payload: any) {
+export async function updateCinemaApi(id: string, payload: UpdateCinemaRequest): Promise<CinemaReadDto> {
   const { data } = await httpClient.put(endpoints.cinemas.update(id), payload);
   return data;
 }
@@ -37,15 +45,14 @@ export async function updateCinemaApi(id: string, payload: any) {
 /**
  * Delete cinema (Admin only)
  */
-export async function deleteCinemaApi(id: string) {
-  const { data } = await httpClient.delete(endpoints.cinemas.delete(id));
-  return data;
+export async function deleteCinemaApi(id: string): Promise<void> {
+  await httpClient.delete(endpoints.cinemas.delete(id));
 }
 
 /**
  * Change cinema status (Admin/Manager only)
  */
-export async function changeCinemaStatusApi(id: string, payload: any) {
+export async function changeCinemaStatusApi(id: string, payload: ChangeCinemaStatusDto): Promise<CinemaReadDto> {
   const { data } = await httpClient.patch(endpoints.cinemas.changeStatus(id), payload);
   return data;
 }
@@ -53,7 +60,7 @@ export async function changeCinemaStatusApi(id: string, payload: any) {
 /**
  * Get cinema statistics (Admin/Manager only)
  */
-export async function getCinemaStatsApi(id: string) {
+export async function getCinemaStatsApi(id: string): Promise<CinemaStatsDto> {
   const { data } = await httpClient.get(endpoints.cinemas.stats(id));
   return data;
 }

@@ -48,12 +48,10 @@ export interface PaymentEvent {
   createdAt: string;
 }
 
-// DTOs for API requests
-export interface CreatePaymentRequest {
+// DTOs for API requests - matches CreatePaymentDto
+export interface CreatePaymentDto {
   bookingId: string;
   provider: PaymentProvider;
-  amountMinor: number;
-  currency?: string;
   returnUrl?: string;
   notifyUrl?: string;
 }
@@ -76,29 +74,18 @@ export interface UpdatePaymentStatusRequest {
   providerData?: Record<string, unknown>;
 }
 
-// API Response types
-export interface PaymentResponse {
+// API Response types - matches PaymentResponseDto
+export interface PaymentResponseDto {
   id: string;
   bookingId: string;
-  booking?: {
-    id: string;
-    code: string;
-    totalAmountMinor: number;
-    customerInfo: {
-      fullName: string;
-      email: string;
-    };
-  };
   provider: PaymentProvider;
   amountMinor: number;
   currency: string;
   status: PaymentStatus;
   providerTxnId?: string;
-  returnUrl?: string;
-  notifyUrl?: string;
+  paymentUrl?: string;
   createdAt: string;
   updatedAt?: string;
-  events?: PaymentEventResponse[];
 }
 
 export interface PaymentEventResponse {
@@ -156,16 +143,14 @@ export interface StripePaymentData {
   status: string;
 }
 
-// Search and filter types
-export interface PaymentSearchParams {
-  page?: number;
-  pageSize?: number;
+// Search and filter types - matches PaymentSearchDto
+export interface PaymentSearchDto {
   bookingId?: string;
   provider?: PaymentProvider;
   status?: PaymentStatus;
-  dateFrom?: string;
-  dateTo?: string;
-  sort?: 'createdAt' | 'amountMinor';
-  order?: 'asc' | 'desc';
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 

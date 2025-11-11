@@ -61,13 +61,17 @@ export interface AuthResponse {
   user: User;
 }
 
-export interface UserResponse {
+// Matches UserReadDto from backend
+export interface UserReadDto {
   id: string;
   email: string;
   phone?: string;
   fullName: string;
-  status: UserStatus;
+  status: string; // "Active", "Inactive", "Banned" - backend returns string
   createdAt: string;
   updatedAt?: string;
-  roles: string[]; // Backend trả về array of strings, không phải Role objects
+  roles: string[]; // Backend trả về array of strings
 }
+
+// Alias for backward compatibility
+export interface UserResponse extends UserReadDto {}

@@ -66,30 +66,106 @@ export interface UpdateRoomRequest {
   status?: EntityStatus;
 }
 
-// API Response types
-export interface CinemaResponse {
+// API Response types - matches CinemaReadDto
+export interface CinemaReadDto {
   id: string;
   name: string;
   address: string;
   city: string;
   lat?: number;
   lng?: number;
-  status: EntityStatus;
+  status: string; // "Active", "Inactive" - backend returns string
   createdAt: string;
-  rooms?: RoomResponse[];
+  totalRooms: number;
+  activeRooms: number;
 }
 
-export interface RoomResponse {
+// Matches CinemaListDto
+export interface CinemaListDto {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  status: string;
+  createdAt: string;
+  totalRooms: number;
+}
+
+// Matches CinemaStatsDto
+export interface CinemaStatsDto {
+  totalRooms: number;
+  activeRooms: number;
+  inactiveRooms: number;
+  totalSeats: number;
+}
+
+// Matches CinemaSearchDto
+export interface CinemaSearchDto {
+  search?: string;
+  city?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+// Matches ChangeCinemaStatusDto
+export interface ChangeCinemaStatusDto {
+  status: string;
+}
+
+// Alias for backward compatibility
+export interface CinemaResponse extends CinemaReadDto {}
+
+// Matches RoomReadDto
+export interface RoomReadDto {
   id: string;
   cinemaId: string;
+  cinemaName: string;
   name: string;
   code: string;
   totalSeats: number;
-  status: EntityStatus;
+  status: string; // "Active", "Inactive" - backend returns string
   createdAt: string;
-  availableSeats?: number;
-  occupiedSeats?: number;
 }
+
+// Matches RoomListDto
+export interface RoomListDto {
+  id: string;
+  cinemaId: string;
+  cinemaName: string;
+  name: string;
+  code: string;
+  totalSeats: number;
+  status: string;
+  createdAt: string;
+}
+
+// Matches RoomStatsDto
+export interface RoomStatsDto {
+  totalSeats: number;
+  activeShowtimes: number;
+  totalShowtimes: number;
+}
+
+// Matches RoomSearchDto
+export interface RoomSearchDto {
+  search?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+// Matches ChangeRoomStatusDto
+export interface ChangeRoomStatusDto {
+  status: string;
+}
+
+// Alias for backward compatibility
+export interface RoomResponse extends RoomReadDto {}
 
 export interface RoomListResponse {
   items: RoomResponse[];

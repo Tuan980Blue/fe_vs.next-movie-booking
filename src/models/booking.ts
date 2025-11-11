@@ -1,20 +1,18 @@
 // Booking related types and enums
 export enum BookingStatus {
   Pending = 1,
-  Held = 2,
-  Confirmed = 3,
-  Canceled = 4,
-  Expired = 5,
-  Refunding = 6,
-  Refunded = 7
+  Confirmed = 2,
+  Canceled = 3,
+  Expired = 4,
+  Refunding = 5,
+  Refunded = 6
 }
 
 export enum BookingItemStatus {
   Pending = 1,
-  Held = 2,
-  Confirmed = 3,
-  Canceled = 4,
-  Expired = 5
+  Confirmed = 2,
+  Canceled = 3,
+  Expired = 4
 }
 
 export enum TicketStatus {
@@ -114,155 +112,131 @@ export interface Ticket {
   issuedAt: string;
 }
 
-// DTOs for API requests
-export interface CreateBookingRequest {
+// DTOs for API requests - matches CreateBookingDto
+export interface CreateBookingDto {
   showtimeId: string;
   seatIds: string[];
-  customerInfo: {
-    fullName: string;
-    email: string;
-    phone: string;
-  };
   promotionCode?: string;
 }
 
-export interface UpdateBookingRequest {
-  status?: BookingStatus;
-  customerInfo?: {
-    fullName?: string;
-    email?: string;
-    phone?: string;
-  };
+// Matches ConfirmBookingDto
+export interface ConfirmBookingDto {
+  paymentId: string;
 }
 
-export interface HoldSeatsRequest {
-  showtimeId: string;
-  seatIds: string[];
-  holdDurationMinutes?: number;
-}
-
-export interface ConfirmBookingRequest {
-  bookingId: string;
-  paymentMethod?: string;
-}
-
-export interface CancelBookingRequest {
-  bookingId: string;
+// Matches CancelBookingDto
+export interface CancelBookingDto {
   reason?: string;
 }
 
-// API Response types
-export interface BookingResponse {
+// Matches BookingSearchDto
+export interface BookingSearchDto {
+  userId?: string;
+  status?: BookingStatus;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+// API Response types - matches BookingResponseDto
+export interface BookingResponseDto {
   id: string;
   code: string;
   userId?: string;
-  user?: {
-    id: string;
-    email: string;
-    fullName: string;
-  };
+  user?: UserInfoDto;
   status: BookingStatus;
-  holdExpiresAt?: string;
   totalAmountMinor: number;
   currency: string;
-  customerInfo: {
-    fullName: string;
-    email: string;
-    phone: string;
-  };
+  bookingQr?: string;
+  customerInfo?: CustomerInfoDto;
   createdAt: string;
   updatedAt?: string;
-  items: BookingItemResponse[];
-  tickets?: TicketResponse[];
+  items: BookingItemResponseDto[];
+  tickets: TicketResponseDto[];
 }
 
-export interface BookingItemResponse {
+// Matches BookingItemResponseDto
+export interface BookingItemResponseDto {
   id: string;
-  bookingId: string;
   showtimeId: string;
-  showtime: {
-    id: string;
-    startUtc: string;
-    endUtc: string;
-    movie: {
-      id: string;
-      title: string;
-      posterUrl?: string;
-    };
-    room: {
-      id: string;
-      name: string;
-      cinema: {
-        id: string;
-        name: string;
-        address: string;
-      };
-    };
-  };
+  showtime: ShowtimeInfoDto;
   seatId: string;
-  seat: {
-    id: string;
-    rowLabel: string;
-    seatNumber: number;
-    seatType: number;
-  };
+  seat: SeatInfoDto;
   seatPriceMinor: number;
   priceCategory?: string;
   status: BookingItemStatus;
   createdAt: string;
 }
 
-export interface TicketResponse {
+// Matches BookingListItemDto
+export interface BookingListItemDto {
   id: string;
-  bookingId: string;
-  showtimeId: string;
-  showtime: {
-    id: string;
-    startUtc: string;
-    endUtc: string;
-    movie: {
-      id: string;
-      title: string;
-    };
-    room: {
-      id: string;
-      name: string;
-      cinema: {
-        id: string;
-        name: string;
-      };
-    };
-  };
-  seatId: string;
-  seat: {
-    id: string;
-    rowLabel: string;
-    seatNumber: number;
-    seatType: number;
-  };
-  ticketCode: string;
-  ticketQr?: string;
-  status: TicketStatus;
-  issuedAt: string;
+  code: string;
+  currency: string;
+  totalAmountMinor: number;
+  status: BookingStatus;
+  createdAt: string;
+  movieTitle?: string;
+  startUtc?: string;
+  cinemaName?: string;
+  seatsCount: number;
 }
 
-export interface BookingListResponse {
-  items: BookingResponse[];
+// Matches BookingListLightResultDto
+export interface BookingListLightResultDto {
+  items: BookingListItemDto[];
   page: number;
   pageSize: number;
   totalItems: number;
-  totalPages: number;
 }
 
-// Search and filter types
-export interface BookingSearchParams {
-  page?: number;
-  pageSize?: number;
-  userId?: string;
-  status?: BookingStatus;
-  dateFrom?: string;
-  dateTo?: string;
-  sort?: 'createdAt' | 'totalAmountMinor';
-  order?: 'asc' | 'desc';
+// Common DTOs used in booking responses
+export interface UserInfoDto {
+  id: string;
+  email: string;
+  fullName: string;
+}
+
+export interface CustomerInfoDto {
+  fullName: string;
+  email: string;
+  phone?: string;
+}
+
+export interface ShowtimeInfoDto {
+  id: string;
+  movieId: string;
+  movieTitle: string;
+  roomId: string;
+  roomName: string;
+  cinemaId: string;
+  cinemaName: string;
+  startUtc: string;
+  endUtc: string;
+  language: string;
+  format: string;
+}
+
+export interface SeatInfoDto {
+  id: string;
+  rowLabel: string;
+  seatNumber: number;
+  seatType: number; // SeatType enum value
+}
+
+// Matches TicketResponseDto from backend
+export interface TicketResponseDto {
+  id: string;
+  ticketCode: string;
+  ticketQr?: string;
+  showtimeId: string;
+  seatId: string;
+  status: TicketStatus;
+  issuedAt: string;
+  checkedInAt?: string;
+  checkedInBy?: string;
 }
 

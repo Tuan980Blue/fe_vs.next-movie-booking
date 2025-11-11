@@ -1,10 +1,14 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
+import type {
+  PricingQuoteRequestDto,
+  PricingQuoteResponseDto,
+} from '../../models';
 
 /**
- * Get pricing quote for seats
+ * Calculate price for seats
  */
-export async function getPricingQuoteApi(payload: any) {
-  const { data } = await httpClient.post(endpoints.pricing.quote, payload);
+export async function calculatePriceApi(payload: PricingQuoteRequestDto): Promise<PricingQuoteResponseDto> {
+  const { data } = await httpClient.post(endpoints.priceCalculation.calculate, payload);
   return data;
 }

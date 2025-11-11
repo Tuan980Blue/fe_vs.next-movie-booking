@@ -1,21 +1,21 @@
 import httpClient from '../api/httpClient';
 import endpoints from '../api/endpoints';
-import { 
-  MovieSearchParams, 
+import type { 
+  MovieSearchDto, 
   MovieResponse, 
   MovieListResponse, 
   CreateMovieRequest, 
   UpdateMovieRequest,
   MovieStatus,
-  GenreResponse
-} from '../../models/movie';
+  GenreReadDto,
+  MovieStatsDto,
+  PagedResult,
+} from '../../models';
 
 /**
  * Fetch paginated list of movies
- * params can include: page, pageSize, keyword, genre, status, sort
- * Returns shape: { items: Movie[], page, pageSize, totalItems }
  */
-export async function getMoviesApi(params: MovieSearchParams = {}): Promise<MovieListResponse> {
+export async function getMoviesApi(params: MovieSearchDto = {}): Promise<PagedResult<MovieResponse>> {
   const { data } = await httpClient.get(endpoints.movies.list, { params });
   return data;
 }
@@ -70,13 +70,7 @@ export async function getMoviesByStatusApi(status: string): Promise<MovieRespons
 /**
  * Get movie statistics (Admin only)
  */
-export async function getMovieStatsApi(): Promise<{
-  totalMovies: number;
-  draftMovies: number;
-  comingSoonMovies: number;
-  nowShowingMovies: number;
-  archivedMovies: number;
-}> {
+export async function getMovieStatsApi(): Promise<MovieStatsDto> {
   const { data } = await httpClient.get(endpoints.movies.stats);
   return data;
 }
