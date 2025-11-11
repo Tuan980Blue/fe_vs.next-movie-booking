@@ -74,4 +74,4 @@ export interface UserReadDto {
 }
 
 // Alias for backward compatibility
-export interface UserResponse extends UserReadDto {}
+export type UserResponse = UserReadDto;

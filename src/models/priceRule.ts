@@ -84,7 +84,7 @@ export interface PriceRuleResponseDto {
 }
 
 // Alias for backward compatibility
-export interface PriceRuleResponse extends PriceRuleResponseDto {}
+export type PriceRuleResponse = PriceRuleResponseDto;
 
 export interface PriceRuleListResponse {
   items: PriceRuleResponse[];

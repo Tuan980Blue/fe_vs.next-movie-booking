@@ -150,7 +150,7 @@ export interface SeatStatsDto {
 }
 
 // Alias for backward compatibility
-export interface SeatResponse extends SeatReadDto {}
+export type SeatResponse = SeatReadDto;
 
 export interface SeatLayoutResponse {
   roomId: string;
