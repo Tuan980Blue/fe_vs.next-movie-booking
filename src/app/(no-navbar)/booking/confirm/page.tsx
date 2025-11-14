@@ -4,9 +4,11 @@
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { getBookingDetailApi, createPaymentApi } from '@/service';
 import type { BookingResponseDto } from '@/models/booking';
-import {PaymentProvider} from "@/models";
+import { BookingStatus, PaymentProvider } from "@/models";
+import { PaymentStatus } from "@/models/payment";
 
 const ConfirmBookingContent = () => {
     const router = useRouter();
@@ -48,21 +50,33 @@ const ConfirmBookingContent = () => {
 
     const startPayment = async (provider: PaymentProvider) => {
         if (!booking?.id || submitting) return;
+
+        if (provider !== PaymentProvider.VnPay) {
+            setError('Phương thức thanh toán này đang được phát triển. Vui lòng chọn VNPay.');
+            return;
+        }
         setSubmitting(true);
         setError('');
         try {
-            const origin = typeof window !== 'undefined' ? window.location.origin : '';
-            const returnUrl = `${origin}/booking/complete?bookingId=${encodeURIComponent(booking.id)}`;
+            // Backend sẽ xử lý VNPay callback và redirect về /booking/payment/{status}
+            // Không cần set returnUrl vì backend đã config sẵn vnp_ReturnUrl trong appsettings.json
+            // Nếu muốn set, phải set là backend endpoint: /api/payments/vnpay-return
             const payment = await createPaymentApi({
                 bookingId: booking.id,
                 provider,
-                returnUrl,
+                // returnUrl: không cần set, backend sẽ dùng config vnp_ReturnUrl
             });
             if (payment?.paymentUrl) {
                 window.location.href = payment.paymentUrl;
                 return;
             }
-            router.push(`/booking/complete?bookingId=${encodeURIComponent(booking.id)}&paymentId=${encodeURIComponent(payment.id)}`);
+            const statusPath =
+                payment.status === PaymentStatus.Succeeded
+                    ? 'success'
+                    : payment.status === PaymentStatus.Pending
+                        ? 'pending'
+                        : 'failed';
+            router.push(`/booking/payment/${statusPath}?paymentId=${encodeURIComponent(payment.id)}&bookingId=${encodeURIComponent(booking.id)}`);
         } catch (e: unknown) {
             setError(e instanceof Error ? e.message : 'Không thể khởi tạo thanh toán.');
         } finally {
@@ -85,10 +99,58 @@ const ConfirmBookingContent = () => {
                 )}
 
                 {!loading && error && (
-                    <div className="rounded-xl p-4 bg-red-50 text-red-600">{error}</div>
+                    <motion.div
+                        className="rounded-xl p-4 bg-red-50 border border-red-200 text-red-800"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <div className="flex items-start gap-2">
+                            <span className="text-lg">⚠️</span>
+                            <div className="flex-1">
+                                <p className="font-medium">{error}</p>
+                                {bookingId && (
+                                    <Link
+                                        href={`/booking/seat-selection?id=${encodeURIComponent(bookingId)}`}
+                                        className="text-sm text-red-600 underline mt-2 inline-block"
+                                    >
+                                        Quay lại chọn ghế
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
                 )}
 
-                {!loading && !error && booking && (
+                {!loading && !error && booking && booking.status !== BookingStatus.Pending && (
+                    <motion.div
+                        className="rounded-xl p-4 bg-amber-50 border border-amber-200 text-amber-800 mb-4"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <div className="flex items-start gap-2">
+                            <span className="text-lg">ℹ️</span>
+                            <div className="flex-1">
+                                <p className="font-medium">
+                                    {booking.status === BookingStatus.Confirmed
+                                        ? 'Đơn đặt vé này đã được xác nhận.'
+                                        : booking.status === BookingStatus.Canceled
+                                            ? 'Đơn đặt vé này đã bị hủy.'
+                                            : booking.status === BookingStatus.Expired
+                                                ? 'Đơn đặt vé này đã hết hạn.'
+                                                : 'Đơn đặt vé không còn ở trạng thái chờ thanh toán.'}
+                                </p>
+                                <Link
+                                    href="/user/my-bookings"
+                                    className="text-sm text-amber-600 underline mt-2 inline-block"
+                                >
+                                    Xem lịch sử đặt vé
+                                </Link>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
+                {!loading && !error && booking && booking.status === BookingStatus.Pending && (
                     <motion.div
                         className="rounded-2xl bg-white/95 backdrop-blur-sm shadow-xl border border-white/20 overflow-hidden"
                         initial={{ opacity: 0, y: 12 }}
@@ -141,19 +203,17 @@ const ConfirmBookingContent = () => {
                                 </button>
                                 <button
                                     type="button"
-                                    disabled={submitting}
-                                    onClick={() => startPayment(PaymentProvider.MoMo)}
-                                    className={`px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-white hover:bg-neutral-lightGray/20 text-sm font-medium ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    disabled
+                                    className="px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-neutral-lightGray/10 text-sm font-medium opacity-60 cursor-not-allowed"
                                 >
-                                    MoMo
+                                    MoMo (sắp ra mắt)
                                 </button>
                                 <button
                                     type="button"
-                                    disabled={submitting}
-                                    onClick={() => startPayment(PaymentProvider.Stripe)}
-                                    className={`px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-white hover:bg-neutral-lightGray/20 text-sm font-medium ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    disabled
+                                    className="px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-neutral-lightGray/10 text-sm font-medium opacity-60 cursor-not-allowed"
                                 >
-                                    Thẻ quốc tế (Stripe)
+                                    Thẻ quốc tế (Stripe) – sắp ra mắt
                                 </button>
                             </div>
                         </div>
