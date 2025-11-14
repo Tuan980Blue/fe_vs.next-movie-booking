@@ -7,7 +7,11 @@ const StepsHeader = () => {
     const pathname = usePathname();
     const router = useRouter();
     const path = pathname || '';
-    const step = path.includes('/complete') ? 3 : path.includes('/confirm') ? 2 : 1;
+    const step = path.includes('/complete') || path.includes('/booking/payment')
+        ? 3
+        : path.includes('/confirm')
+            ? 2
+            : 1;
 
     const steps = [
         {id: 1, label: 'Chọn ghế', icon: '💺'},

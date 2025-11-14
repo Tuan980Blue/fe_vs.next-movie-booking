@@ -24,7 +24,8 @@ const SeatSelectionContent = () => {
     const { user, isAuthenticated } = useAuth();
     const dispatch = useDispatch();
     const selectedSeatIds = useSelector((s: RootState) => s.seatSelection.selectedSeatIds);
-    const [secondsLeft, setSecondsLeft] = useState<number>(5 * 60);
+    const INITIAL_HOLD_SECONDS = 3 * 60;
+    const [secondsLeft, setSecondsLeft] = useState<number>(INITIAL_HOLD_SECONDS);
 
     const [showtime, setShowtime] = useState<ShowtimeReadDto | null>(null);
     const [layout, setLayout] = useState<SeatLayoutUi | null>(null);
@@ -38,7 +39,7 @@ const SeatSelectionContent = () => {
 
     //Join group
     type SeatLockEvent = {
-        action: "lock" | "unlock" | "booked";
+        action: "lock" | "unlock" | "booked" | "extend";
         lockedSeatIds?: string[];
         unlockedSeatIds?: string[];
         bookedSeatIds?: string[];
@@ -51,6 +52,7 @@ const SeatSelectionContent = () => {
         (data) => {
             switch (data.action) {
                 case "lock":
+                case "extend":
                     if (data.lockedSeatIds?.length) {
                         setLockedSeatIds(prev => {
                             const next = new Set(prev);
@@ -88,7 +90,8 @@ const SeatSelectionContent = () => {
     useEffect(() => {
         setLockedSeatIds(new Set());
         setBookedSeatIds(new Set());
-    }, [showtimeId]);
+        setSecondsLeft(INITIAL_HOLD_SECONDS);
+    }, [showtimeId, INITIAL_HOLD_SECONDS]);
 
     // Fetch showtime data by ID
     useEffect(() => {
@@ -282,18 +285,35 @@ const SeatSelectionContent = () => {
                     <div className="flex items-center justify-end text-xs text-gray-800/80 font-medium gap-2">
                         <span>Giữ chỗ còn</span>
                         <motion.div
-                            className="inline-flex items-center"
-                            animate={{ scale: [1, 1.05, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
+                            className={`inline-flex items-center ${secondsLeft <= 60 ? 'text-red-500' : secondsLeft <= 120 ? 'text-amber-500' : 'text-pink-500'}`}
+                            animate={secondsLeft <= 60 ? { scale: [1, 1.1, 1] } : { scale: [1, 1.05, 1] }}
+                            transition={{ duration: secondsLeft <= 60 ? 1 : 2, repeat: Infinity }}
                         >
-                            <span className="text-pink-500 font-bold text-lg tabular-nums">
+                            <span className={`font-bold text-lg tabular-nums ${secondsLeft <= 60 ? 'text-red-500' : secondsLeft <= 120 ? 'text-amber-500' : 'text-pink-500'}`}>
                                 {minutes}:{seconds}
                             </span>
                         </motion.div>
                     </div>
+                    {secondsLeft <= 60 && secondsLeft > 0 && (
+                        <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2 text-sm text-amber-800">
+                            ⚠️ Thời gian giữ chỗ sắp hết! Vui lòng hoàn tất đặt vé trong {secondsLeft} giây.
+                        </div>
+                    )}
 
                     {!loading && error && (
-                        <div className="text-accent-red mb-4">{error}</div>
+                        <motion.div
+                            className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-red-800"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <div className="flex items-start gap-2">
+                                <span className="text-lg">⚠️</span>
+                                <div className="flex-1">
+                                    <p className="font-medium">{error}</p>
+                                    <p className="text-sm text-red-600 mt-1">Vui lòng thử lại hoặc chọn ghế khác.</p>
+                                </div>
+                            </div>
+                        </motion.div>
                     )}
 
                     {!loading && !error && layout && (
@@ -593,7 +613,7 @@ const SeatSelectionContent = () => {
 
                                 <div className="space-y-2 text-sm">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-neutral-darkGray/80">Giá vé</span>
+                                        <span className="text-neutral-darkGray/80">Giá vé (ước tính)</span>
                                         <span className="font-medium">{formatVnd(basePrice)}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
@@ -601,9 +621,12 @@ const SeatSelectionContent = () => {
                                         <span className="font-medium">{selectedSeatIds.length}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-lg font-bold">
-                                        <span>Tổng</span>
+                                        <span>Tạm tính</span>
                                         <span className="text-primary-pink">{formatVnd(totalPrice)}</span>
                                     </div>
+                                    <p className="text-xs text-neutral-darkGray/60 italic mt-1">
+                                        * Giá chính xác sẽ được hiển thị ở bước xác nhận
+                                    </p>
                                 </div>
                             </div>
                         </div>

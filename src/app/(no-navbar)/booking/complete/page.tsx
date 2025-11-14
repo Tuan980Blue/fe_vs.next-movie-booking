@@ -4,13 +4,14 @@
 import {motion} from "framer-motion";
 import Link from "next/link";
 import {Suspense, useEffect, useMemo, useState} from "react";
-import {useSearchParams} from "next/navigation";
-import {getBookingDetailApi, vnpayReturnApi, getPaymentDetailApi} from "@/service";
+import {useRouter, useSearchParams} from "next/navigation";
+import {getBookingDetailApi, getPaymentDetailApi} from "@/service";
 import {PaymentStatus} from "@/models/payment";
 import {BookingStatus} from "@/models/booking";
 import type {BookingResponseDto} from "@/models/booking";
 
 const BookingCompleteContent = () => {
+    const router = useRouter();
     const [showConfetti, setShowConfetti] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -21,29 +22,25 @@ const BookingCompleteContent = () => {
     const paymentId = searchParams.get('paymentId');
 
     useEffect(() => {
-        setShowConfetti(true);
-        // Hide confetti after 3 seconds
-        const timer = setTimeout(() => setShowConfetti(false), 3000);
-        return () => clearTimeout(timer);
-    }, []);
-
-    useEffect(() => {
         let ignore = false;
         async function run() {
             if (!bookingId) return;
             try {
                 setLoading(true);
                 setError('');
-                // VNPay return: call backend to validate return params
                 const params = Object.fromEntries(searchParams.entries());
                 const hasVnpParams = Object.keys(params).some(k => k.toLowerCase().startsWith('vnp_'));
                 if (hasVnpParams) {
-                    try {
-                        await vnpayReturnApi(params as Record<string, string>);
-                    } catch {
-                        setError('Không thể xác thực phản hồi từ VNPay.');
+                    const vnpTxnRef = params['vnp_TxnRef'] ?? params['vnp_txnref'];
+                    const responseCode = params['vnp_ResponseCode'] ?? params['vnp_responsecode'];
+                    const redirectStatus = responseCode === '00' ? 'success' : 'failed';
+                    if (vnpTxnRef) {
+                        router.replace(`/booking/payment/${redirectStatus}?paymentId=${encodeURIComponent(vnpTxnRef)}&bookingId=${encodeURIComponent(bookingId)}`);
+                        return;
                     }
-                } else if (paymentId) {
+                }
+
+                if (paymentId) {
                     // For other providers, read payment status if present
                     try {
                         const p = await getPaymentDetailApi(paymentId);
@@ -69,7 +66,7 @@ const BookingCompleteContent = () => {
         return () => {
             ignore = true;
         };
-    }, [bookingId, paymentId, searchParams]);
+    }, [bookingId, paymentId, searchParams, router]);
 
     const formatVnd = (amount: number) =>
         (amount || 0).toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
@@ -95,6 +92,65 @@ const BookingCompleteContent = () => {
             bookingCode: booking?.code || ''
         };
     }, [booking]);
+
+    const bookingStatus = booking?.status;
+    const heroState = useMemo<"success" | "pending" | "failed">(() => {
+        if (bookingStatus === BookingStatus.Confirmed) {
+            return "success";
+        }
+        if (bookingStatus === BookingStatus.Canceled || bookingStatus === BookingStatus.Expired ||
+            paymentStatus === PaymentStatus.Failed || paymentStatus === PaymentStatus.Canceled) {
+            return "failed";
+        }
+        return "pending";
+    }, [bookingStatus, paymentStatus]);
+
+    useEffect(() => {
+        if (heroState === "success") {
+            setShowConfetti(true);
+            const timer = setTimeout(() => setShowConfetti(false), 3000);
+            return () => clearTimeout(timer);
+        }
+        setShowConfetti(false);
+        return;
+    }, [heroState]);
+
+    const heroMeta = useMemo(() => {
+        switch (heroState) {
+            case "success":
+                return {
+                    icon: "✅",
+                    gradient: "from-green-400 to-green-600",
+                    title: "Đặt vé thành công!",
+                    message: "Cảm ơn bạn đã tin tưởng TA MEM CINEMA. Thông tin vé đã được gửi về email của bạn.",
+                };
+            case "failed":
+                return {
+                    icon: "⚠️",
+                    gradient: "from-rose-500 to-red-500",
+                    title: "Thanh toán chưa hoàn tất",
+                    message: "Giao dịch không thành công hoặc bị hủy. Vui lòng thử thanh toán lại hoặc chọn phương thức khác.",
+                };
+            default:
+                return {
+                    icon: "⏳",
+                    gradient: "from-amber-400 to-amber-500",
+                    title: "Đang chờ xác nhận thanh toán",
+                    message: "Hệ thống đang xác nhận giao dịch với cổng thanh toán. Bạn có thể tải lại trang sau ít phút.",
+                };
+        }
+    }, [heroState]);
+
+    const glowColor = useMemo(() => {
+        switch (heroState) {
+            case "success":
+                return "rgba(34, 197, 94, 0.7)";
+            case "pending":
+                return "rgba(245, 158, 11, 0.7)";
+            default:
+                return "rgba(248, 113, 113, 0.7)";
+        }
+    }, [heroState]);
 
     return (
         <div className="min-h-screen py-8 px-4 lg:px-8">
@@ -131,28 +187,28 @@ const BookingCompleteContent = () => {
                         {error}
                         {bookingId && (
                             <div className="mt-2">
-                                <Link href={`/booking/payment?bookingId=${encodeURIComponent(bookingId)}`} className="underline text-red-600">
+                                <Link href={`/booking/confirm?bookingId=${encodeURIComponent(bookingId)}`} className="underline text-red-600">
                                     Thử thanh toán lại
                                 </Link>
                             </div>
                         )}
                     </div>
                 )}
-                {/* Success Animation */}
+                {/* Status Banner */}
                 <motion.div
-                    className="text-center mb-6"
+                    className="mb-6 text-center"
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     <motion.div
-                        className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full mb-2 shadow-xl"
+                        className={`inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r ${heroMeta.gradient} shadow-xl mb-2`}
                         animate={{
                             scale: [1, 1.1, 1],
                             boxShadow: [
-                                "0 0 0 0 rgba(34, 197, 94, 0.7)",
-                                "0 0 0 10px rgba(34, 197, 94, 0)",
-                                "0 0 0 0 rgba(34, 197, 94, 0)"
+                                `0 0 0 0 ${glowColor}`,
+                                `0 0 0 10px ${glowColor.replace("0.7", "0")}`,
+                                `0 0 0 0 ${glowColor.replace("0.7", "0")}`
                             ]
                         }}
                         transition={{ duration: 2, repeat: Infinity }}
@@ -163,24 +219,24 @@ const BookingCompleteContent = () => {
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.3, duration: 0.5 }}
                         >
-                            ✅
+                            {heroMeta.icon}
                         </motion.span>
                     </motion.div>
                     <motion.h1
-                        className="text-xl font-bold text-gray-700 mb-2 drop-shadow-lg"
+                        className="mb-2 text-xl font-bold text-gray-700 drop-shadow-lg"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                     >
-                        Đặt vé thành công!
+                        {heroMeta.title}
                     </motion.h1>
                     <motion.p
-                        className="text-pink-500 text-sm max-w-2xl mx-auto"
+                        className="max-w-2xl mx-auto text-sm text-pink-500"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
                     >
-                        Cảm ơn bạn đã tin tưởng TA MEM CINEMA. Thông tin vé đã được gửi về email của bạn.
+                        {heroMeta.message}
                     </motion.p>
                 </motion.div>
 
@@ -271,44 +327,103 @@ const BookingCompleteContent = () => {
 
                 {/* Action Buttons */}
                 <motion.div
-                    className="flex flex-col sm:flex-row gap-4 justify-center"
+                    className="flex flex-col justify-center gap-4 sm:flex-row"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.3 }}
                 >
-                    <Link href="/user/my-bookings">
-                        <motion.button
-                            className="w-full sm:w-auto px-8 py-4 bg-primary-pink text-white font-bold text-lg rounded-xl cursor-pointer transition-all duration-300"
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            Xem vé của tôi
-                        </motion.button>
-                    </Link>
-                    
-                    <Link href="/">
-                        <motion.button
-                            className="w-full sm:w-auto px-8 py-4 bg-white backdrop-blur-sm text-gray-400 font-bold text-lg rounded-xl cursor-pointer border-2 border-white/30 transition-all duration-300"
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            Về trang chủ
-                        </motion.button>
-                    </Link>
+                    {heroState === "success" && (
+                        <>
+                            <Link href="/user/my-bookings">
+                                <motion.button
+                                    className="w-full cursor-pointer rounded-xl bg-primary-pink px-8 py-4 text-lg font-bold text-white transition-all duration-300 sm:w-auto"
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Xem vé của tôi
+                                </motion.button>
+                            </Link>
+                            <Link href="/">
+                                <motion.button
+                                    className="w-full cursor-pointer rounded-xl border-2 border-white/30 bg-white px-8 py-4 text-lg font-bold text-gray-400 transition-all duration-300 backdrop-blur-sm sm:w-auto"
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Về trang chủ
+                                </motion.button>
+                            </Link>
+                        </>
+                    )}
+                    {heroState === "pending" && (
+                        <>
+                            <motion.button
+                                className="w-full cursor-pointer rounded-xl bg-primary-pink px-8 py-4 text-lg font-bold text-white transition-all duration-300 sm:w-auto"
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => window.location.reload()}
+                            >
+                                Làm mới trạng thái
+                            </motion.button>
+                            <Link href="/user/my-bookings">
+                                <motion.button
+                                    className="w-full cursor-pointer rounded-xl border border-primary-pink/30 bg-white px-8 py-4 text-lg font-bold text-primary-pink transition-all duration-300 sm:w-auto"
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Xem lịch sử đặt vé
+                                </motion.button>
+                            </Link>
+                        </>
+                    )}
+                    {heroState === "failed" && (
+                        <>
+                            <Link href={bookingId ? `/booking/confirm?bookingId=${encodeURIComponent(bookingId)}` : "/booking/seat-selection"}>
+                                <motion.button
+                                    className="w-full cursor-pointer rounded-xl bg-primary-pink px-8 py-4 text-lg font-bold text-white transition-all duration-300 sm:w-auto"
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Thử thanh toán lại
+                                </motion.button>
+                            </Link>
+                            <Link href="/booking/seat-selection">
+                                <motion.button
+                                    className="w-full cursor-pointer rounded-xl border border-red-200 bg-white px-8 py-4 text-lg font-bold text-red-500 transition-all duration-300 sm:w-auto"
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Chọn suất chiếu khác
+                                </motion.button>
+                            </Link>
+                        </>
+                    )}
                 </motion.div>
 
                 {/* Additional Info */}
                 <motion.div
-                    className="text-center mt-2"
+                    className="mt-2 text-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.5 }}
                 >
-                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h3 className="text-pink-400 font-semibold mb-3">📧 Thông tin quan trọng</h3>
-                        <div className="text-gray-600 text-sm space-y-2">
-                            <p>• Vé điện tử đã được gửi về email của bạn</p>
-                            <p>• Vui lòng đến rạp trước 15 phút để làm thủ tục</p>
-                            <p>• Mang theo CMND/CCCD để xác thực khi lấy vé</p>
-                            <p>• Liên hệ hotline: 1900-xxx-xxx nếu cần hỗ trợ</p>
+                    <div className="rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-sm">
+                        <h3 className="mb-3 font-semibold text-pink-400">📧 Thông tin quan trọng</h3>
+                        <div className="space-y-2 text-sm text-gray-600">
+                            {heroState === "success" && (
+                                <>
+                                    <p>• Vé điện tử đã được gửi về email của bạn.</p>
+                                    <p>• Vui lòng đến rạp trước 15 phút để làm thủ tục.</p>
+                                    <p>• Mang theo CMND/CCCD để xác thực khi lấy vé.</p>
+                                </>
+                            )}
+                            {heroState === "pending" && (
+                                <>
+                                    <p>• Hệ thống sẽ tự động cập nhật khi thanh toán hoàn tất.</p>
+                                    <p>• Nếu bạn đã bị trừ tiền, giao dịch sẽ được đồng bộ trong vài phút.</p>
+                                    <p>• Liên hệ hotline: 1900-xxx-xxx nếu cần hỗ trợ khẩn.</p>
+                                </>
+                            )}
+                            {heroState === "failed" && (
+                                <>
+                                    <p>• Giao dịch chưa thành công nên vé chưa được phát hành.</p>
+                                    <p>• Nếu tiền đã trừ, vui lòng giữ lại hóa đơn và liên hệ hỗ trợ.</p>
+                                    <p>• Bạn có thể thử thanh toán lại hoặc chọn phương thức khác.</p>
+                                </>
+                            )}
                         </div>
                     </div>
                 </motion.div>
