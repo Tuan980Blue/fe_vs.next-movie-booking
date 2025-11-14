@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import SeatSelectionSkeleton from "@/app/(no-navbar)/booking/seat-selection/_components/SeatSelectionSkeleton";
-import { getSeatLayoutApi, getShowtimeByIdApi } from "@/service";
+import { getSeatLayoutApi, getShowtimeByIdApi, getBookedSeatsApi } from "@/service";
 import { useAuth } from "@/providers/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { SeatLayoutUi, SeatUi, SeatLegendItem } from "@/models/seat";
@@ -164,6 +164,26 @@ const SeatSelectionContent = () => {
             }
         }
         fetchLocked();
+        return () => {
+            ignore = true;
+        };
+    }, [showtimeId]);
+
+    // Initial fetch booked seats state for the showtime
+    useEffect(() => {
+        let ignore = false;
+        async function fetchBooked() {
+            if (!showtimeId) return;
+            try {
+                const data = await getBookedSeatsApi(showtimeId);
+                if (!ignore && data?.bookedSeatIds?.length) {
+                    setBookedSeatIds(new Set(data.bookedSeatIds));
+                }
+            } catch {
+                // ignore initial fetch errors
+            }
+        }
+        fetchBooked();
         return () => {
             ignore = true;
         };
@@ -427,6 +447,7 @@ const SeatSelectionContent = () => {
                                                                     const locked = isLockedByOthers(s.id);
                                                                     const booked = isBooked(s.id);
                                                                     const baseColor = getSeatColorByType(s.seatType);
+                                                                    const isDisabled = locked || booked || !isSeatActive(s);
                                                                     // Priority: booked (red) > locked (green) > selected (yellow) > base
                                                                     const bg = booked
                                                                         ? '#EF4444'
@@ -442,7 +463,9 @@ const SeatSelectionContent = () => {
                                                                             key={s.id}
                                                                             type="button"
                                                                             onClick={() => toggleSeat(s)}
-                                                                            className="h-10 rounded-lg border-2 border-neutral-lightGray/30 flex items-center justify-center text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-pink/40 transition-all duration-200"
+                                                                            className={`h-10 rounded-lg border-2 border-neutral-lightGray/30 flex items-center justify-center text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-pink/40 transition-all duration-200 ${
+                                                                                isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+                                                                            }`}
                                                                             title={`${s.rowLabel}${s.seatNumber} • ${s.seatType}`}
                                                                             aria-label={`${s.rowLabel}${String(s.seatNumber).padStart(2, '0')} ${s.seatType}`}
                                                                             style={{
@@ -451,8 +474,8 @@ const SeatSelectionContent = () => {
                                                                                 width,
                                                                                 borderColor: selected ? '#FACC15' : 'rgba(156, 163, 175, 0.3)'
                                                                             }}
-                                                                            disabled={locked || booked || !isSeatActive(s)}
-                                                                            whileHover={{ backgroundColor: '#FACC15' }}
+                                                                            disabled={isDisabled}
+                                                                            whileHover={!isDisabled ? { backgroundColor: '#FACC15' } : {}}
                                                                             transition={{ duration: 0.3 }}
                                                                         >
                                                                             {s.seatNumber}

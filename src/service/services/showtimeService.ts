@@ -55,5 +55,11 @@ export async function deleteShowtimeApi(id: string): Promise<void> {
   await httpClient.delete(endpoints.showtimes.delete(id));
 }
 
-
+/**
+ * Get booked seat IDs for a showtime
+ */
+export async function getBookedSeatsApi(showtimeId: string): Promise<{ showtimeId: string; bookedSeatIds: string[]; count: number }> {
+  const { data } = await httpClient.get(endpoints.showtimes.bookedSeats(showtimeId));
+  return data;
+}
 
