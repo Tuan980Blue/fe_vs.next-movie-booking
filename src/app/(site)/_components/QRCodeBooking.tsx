@@ -39,7 +39,7 @@ export default function QrCodeBooking({bookingQr}: { bookingQr: string; }) {
             >
 
                 {/* Nội dung vé */}
-                <div className="flex flex-col md:flex-row items-center gap-4 bg-gray-950/40 rounded-xl p-4 border border-gray-700">
+                <div className="flex flex-col md:flex-row items-center gap-4">
                     {/* Thông tin phim */}
                     <div className="flex-1 text-center md:text-left">
                         {/* Logo */}

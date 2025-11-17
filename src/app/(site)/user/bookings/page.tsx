@@ -1,8 +1,5 @@
-import QrCodeBooking from "@/app/(site)/user/bookings/_components/QRCodeBooking";
 
 export default function UserBookingsPage() {
-    //mã này sẽ được lấy từ booking trả về cảu api sau này.
-    const bookingQr = "EAPNJNPK"
 
     return (
         <div className="space-y-6">
@@ -11,11 +8,6 @@ export default function UserBookingsPage() {
                 <p className="text-white/80 mt-1">Quản lý vé đã đặt và lịch sử giao dịch.</p>
             </div>
 
-            {/*test qr code*/}
-            <div>
-                <QrCodeBooking bookingQr={bookingQr}>
-                </QrCodeBooking>
-            </div>
         </div>
     );
 }

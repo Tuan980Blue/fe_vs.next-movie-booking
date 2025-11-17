@@ -19,6 +19,8 @@ const ConfirmBookingContent = () => {
     const [error, setError] = useState<string>('');
     const [booking, setBooking] = useState<BookingResponseDto | null>(null);
     const [submitting, setSubmitting] = useState<boolean>(false);
+    const [selectedProvider, setSelectedProvider] = useState<PaymentProvider | null>(PaymentProvider.VnPay);
+    const [timeLeft, setTimeLeft] = useState<number>(5 * 60);
 
     useEffect(() => {
         let ignore = false;
@@ -46,7 +48,34 @@ const ConfirmBookingContent = () => {
         (amount || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
     const items = booking?.items || [];
-    const total = useMemo(() => booking?.totalAmountMinor || items.reduce((s, it) => s + (it.seatPriceMinor || 0), 0), [booking, items]);
+    const total = useMemo(
+        () => booking?.totalAmountMinor || items.reduce((s, it) => s + (it.seatPriceMinor || 0), 0),
+        [booking, items]
+    );
+    const customerInfo = booking?.customerInfo || {
+        fullName: booking?.user?.fullName || 'Khách hàng',
+        email: booking?.user?.email || '-',
+        phone: undefined,
+    };
+    const seatNames = items
+        .map(it => `${it.seat.rowLabel}${String(it.seat.seatNumber).padStart(2, '0')}`)
+        .join(', ');
+    const showtime = items[0]?.showtime;
+    const formattedShowtime = showtime
+        ? new Intl.DateTimeFormat('vi-VN', {
+            weekday: 'long',
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(showtime.startUtc))
+        : '-';
+    const formattedHoldTime = useMemo(() => {
+        const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const seconds = (timeLeft % 60).toString().padStart(2, '0');
+        return `${minutes}:${seconds}`;
+    }, [timeLeft]);
+    const loyaltyPoints = 735; // Placeholder – awaiting real loyalty integration
 
     const startPayment = async (provider: PaymentProvider) => {
         if (!booking?.id || submitting) return;
@@ -84,9 +113,30 @@ const ConfirmBookingContent = () => {
         }
     };
 
+    useEffect(() => {
+        if (!booking || booking.status !== BookingStatus.Pending) return;
+        setTimeLeft(5 * 60);
+    }, [booking?.id, booking?.status]);
+
+    useEffect(() => {
+        if (timeLeft <= 0) return;
+        const timer = setInterval(() => {
+            setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    const handleSubmit = () => {
+        if (!selectedProvider) {
+            setError('Vui lòng chọn phương thức thanh toán.');
+            return;
+        }
+        startPayment(selectedProvider);
+    };
+
     return (
         <div className="py-8 px-4 lg:px-8 min-h-screen">
-            <div className="max-w-4xl mx-auto">
+            <div className="mx-auto">
                 <div className="mb-6">
                     <h1 className="text-2xl font-bold text-neutral-darkGray">Xác nhận đặt vé</h1>
                     {booking?.code && (
@@ -152,73 +202,164 @@ const ConfirmBookingContent = () => {
 
                 {!loading && !error && booking && booking.status === BookingStatus.Pending && (
                     <motion.div
-                        className="rounded-2xl bg-white/95 backdrop-blur-sm shadow-xl border border-white/20 overflow-hidden"
+                        className="grid gap-6 lg:grid-cols-[minmax(0,_2fr)_minmax(320px,_1fr)]"
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <div className="px-6 py-5 border-b border-neutral-lightGray/40 bg-gradient-to-r from-primary-pink to-pink-400 text-white">
-                            <div className="flex items-center justify-between">
-                                <div className="font-bold">Thông tin vé</div>
-                                <div className="text-sm">Tổng: {formatVnd(total)}</div>
-                            </div>
-                        </div>
-
-                        <div className="px-6 py-5 space-y-6">
-                            <div className="space-y-2">
-                                <div className="font-medium text-neutral-darkGray">Chi tiết ghế</div>
-                                <div className="rounded-lg ring-1 ring-neutral-lightGray/50 divide-y divide-neutral-lightGray/40 overflow-hidden">
-                                    {items.map(it => (
-                                        <div key={it.id} className="flex items-center justify-between px-4 py-3 bg-white">
-                                            <div className="text-sm text-neutral-darkGray">
-                                                <div className="font-medium">{it.showtime.movieTitle}</div>
-                                                <div className="text-neutral-darkGray/70">
-                                                    {it.showtime.roomName} • {it.showtime.cinemaName}
-                                                </div>
-                                                <div className="text-neutral-darkGray/70">
-                                                    Ghế: {it.seat.rowLabel}{String(it.seat.seatNumber).padStart(2, '0')}
-                                                </div>
-                                            </div>
-                                            <div className="text-sm font-semibold">{formatVnd(it.seatPriceMinor)}</div>
-                                        </div>
-                                    ))}
+                        <div className="rounded-2xl bg-white shadow-xl ring-1 ring-neutral-lightGray/30 overflow-hidden">
+                            <div className="px-6 py-5 border-b border-neutral-lightGray/30 bg-gradient-to-r from-primary-pink to-pink-400 text-white">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold uppercase tracking-wide">Thông tin vé</p>
+                                        {booking.code && <p className="text-xs text-white/80 mt-0.5">Mã giữ chỗ: {booking.code}</p>}
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-white/70">Thời gian còn lại</p>
+                                        <p className="text-2xl font-bold">{formattedHoldTime}</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-neutral-darkGray">
-                                <span className="text-sm">Tạm tính</span>
-                                <span className="font-semibold">{formatVnd(total)}</span>
+                            <div className="px-6 py-6 space-y-6">
+                                <section className="space-y-1">
+                                    <p className="text-sm font-semibold text-neutral-darkGray">Thông tin vé</p>
+                                    <div className="rounded-xl border border-neutral-lightGray/40 bg-neutral-lightGray/5 p-4 text-sm text-neutral-darkGray space-y-1">
+                                        <div className="text-lg font-bold text-neutral-black">{showtime?.movieTitle}</div>
+                                        <div>{formattedShowtime}</div>
+                                        <div>Phòng chiếu: {showtime?.roomName || '-'}</div>
+                                        <div>Ghế đã chọn: <span className="font-semibold">{seatNames || '-'}</span></div>
+                                    </div>
+                                </section>
+
+                                <section className="space-y-2">
+                                    <p className="text-sm font-semibold text-neutral-darkGray">Thông tin đặt vé</p>
+                                    <div className="grid gap-3 lg:grid-cols-2 text-sm text-neutral-darkGray">
+                                        <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-4">
+                                            <p className="text-xs text-neutral-darkGray/70 uppercase tracking-wide">Họ tên</p>
+                                            <p className="font-medium">{customerInfo.fullName}</p>
+                                        </div>
+                                        <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-4">
+                                            <p className="text-xs text-neutral-darkGray/70 uppercase tracking-wide">Số điện thoại</p>
+                                            <p className="font-medium">{customerInfo.phone || '—'}</p>
+                                        </div>
+                                        <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-4 lg:col-span-2">
+                                            <p className="text-xs text-neutral-darkGray/70 uppercase tracking-wide">Email</p>
+                                            <p className="font-medium break-all">{customerInfo.email}</p>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section className="space-y-2">
+                                    <p className="text-sm font-semibold text-neutral-darkGray">Chi tiết ghế</p>
+                                    <div className="rounded-xl border border-neutral-lightGray/40 divide-y divide-neutral-lightGray/30 overflow-hidden">
+                                        {items.map(it => (
+                                            <div key={it.id} className="flex flex-col gap-2 md:flex-row md:items-center justify-between px-4 py-3 bg-white text-sm">
+                                                <div>
+                                                    <p className="font-semibold text-neutral-black">{it.showtime.movieTitle}</p>
+                                                    <p className="text-neutral-darkGray/70">{it.showtime.roomName} • {it.showtime.cinemaName}</p>
+                                                    <p className="text-neutral-darkGray/70">Ghế: {it.seat.rowLabel}{String(it.seat.seatNumber).padStart(2, '0')}</p>
+                                                </div>
+                                                <p className="font-semibold text-neutral-black">{formatVnd(it.seatPriceMinor)}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                <section className="space-y-2">
+                                    <p className="text-sm font-semibold text-neutral-darkGray">Thông tin combo bắp nước</p>
+                                    <div className="rounded-xl border border-dashed border-neutral-lightGray/70 bg-neutral-lightGray/10 p-4 text-sm text-neutral-darkGray/80">
+                                        Hiện chưa thêm combo bắp nước. Bạn có thể quay lại bước trước để chọn thêm.
+                                    </div>
+                                </section>
+
+                                <section className="space-y-2">
+                                    <p className="text-sm font-semibold text-neutral-darkGray">Lưu ý</p>
+                                    <ul className="list-disc pl-6 text-sm text-neutral-darkGray/90 space-y-1">
+                                        <li>Vé đã mua không thể đổi hoặc trả lại.</li>
+                                        <li>Khi cần, vui lòng xuất trình giấy tờ tùy thân để kiểm tra độ tuổi.</li>
+                                        <li>Chỉ cần lưu lại mã giữ chỗ hoặc email xác nhận để soát vé.</li>
+                                        <li>Nếu có combo online bạn sẽ được ưu tiên xếp hàng ở quầy bắp nước.</li>
+                                    </ul>
+                                </section>
                             </div>
                         </div>
 
-                        <div className="px-6 py-5 space-y-4">
-                            <div className="text-sm text-neutral-darkGray/80">Chọn phương thức thanh toán</div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <aside className="rounded-2xl bg-white shadow-xl ring-1 ring-neutral-lightGray/30 overflow-hidden h-fit">
+                            <div className="p-6 space-y-4">
+                                <button
+                                    type="button"
+                                    className="w-full rounded-xl bg-gradient-to-r from-primary-pink to-pink-400 text-white text-sm font-semibold py-3 shadow"
+                                >
+                                    Sử dụng Coupon hoặc Voucher
+                                </button>
+
+                                <div className="text-right text-neutral-darkGray">
+                                    <p className="text-sm">Tổng cộng</p>
+                                    <p className="text-3xl font-bold text-primary-pink">{formatVnd(total)}</p>
+                                    <p className="text-xs text-neutral-darkGray/70">Vé ghế: {formatVnd(total)}</p>
+                                </div>
+
+                                <div className="rounded-xl border border-neutral-lightGray/40 p-4 text-sm text-neutral-darkGray space-y-1">
+                                    <p className="font-semibold text-primary-pink">★ Dùng điểm để đổi vé và bắp nước</p>
+                                    <p>Bạn đang có <span className="font-semibold">{loyaltyPoints}</span> điểm.</p>
+                                    <p className="text-neutral-darkGray/70">Bạn chưa chọn quà đổi</p>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <p className="text-sm font-semibold text-neutral-darkGray">Chọn phương thức thanh toán</p>
+                                    <div className="space-y-2">
+                                        <label className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ${selectedProvider === PaymentProvider.VnPay ? 'border-primary-pink bg-primary-pink/5' : 'border-neutral-lightGray/60'}`}>
+                                            <input
+                                                type="radio"
+                                                name="payment-provider"
+                                                value="vnpay"
+                                                checked={selectedProvider === PaymentProvider.VnPay}
+                                                onChange={() => setSelectedProvider(PaymentProvider.VnPay)}
+                                                className="accent-primary-pink"
+                                            />
+                                            <div>
+                                                <p className="font-medium text-neutral-darkGray">Thanh toán qua VNPay</p>
+                                                <p className="text-xs text-neutral-darkGray/70">Thẻ nội địa / Thẻ quốc tế / QR code</p>
+                                            </div>
+                                        </label>
+
+                                        <label className="flex items-center gap-3 rounded-xl border border-neutral-lightGray/60 bg-neutral-lightGray/10 px-4 py-3 text-sm opacity-60">
+                                            <input type="radio" disabled className="accent-neutral-lightGray"/>
+                                            <div>
+                                                <p className="font-medium text-neutral-darkGray">Ví điện tử MoMo</p>
+                                                <p className="text-xs text-neutral-darkGray/70">Sắp ra mắt</p>
+                                            </div>
+                                        </label>
+
+                                        <label className="flex items-center gap-3 rounded-xl border border-neutral-lightGray/60 bg-neutral-lightGray/10 px-4 py-3 text-sm opacity-60">
+                                            <input type="radio" disabled className="accent-neutral-lightGray"/>
+                                            <div>
+                                                <p className="font-medium text-neutral-darkGray">Ví ShopeePay</p>
+                                                <p className="text-xs text-neutral-darkGray/70">Sắp ra mắt</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl border border-neutral-lightGray/60 bg-neutral-lightGray/10 p-4 text-xs text-neutral-darkGray/80 space-y-1">
+                                    <p className="font-semibold text-neutral-darkGray">Điều khoản thanh toán trực tuyến</p>
+                                    <p>Vui lòng kiểm tra kỹ thông tin đặt vé trước khi thanh toán.</p>
+                                    <p>Không hoàn tiền cho các đơn đã thanh toán thành công.</p>
+                                </div>
+                            </div>
+                            <div className="p-6 border-t border-neutral-lightGray/40 bg-neutral-lightGray/5">
                                 <button
                                     type="button"
                                     disabled={submitting}
-                                    onClick={() => startPayment(PaymentProvider.VnPay)}
-                                    className={`px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-white hover:bg-neutral-lightGray/20 text-sm font-medium ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+                                    onClick={handleSubmit}
+                                    className={`w-full rounded-xl py-3 text-center text-white text-sm font-semibold transition ${
+                                        submitting ? 'bg-neutral-lightGray cursor-not-allowed' : 'bg-primary-pink hover:bg-primary-pink/90'
+                                    }`}
                                 >
-                                    VNPay
-                                </button>
-                                <button
-                                    type="button"
-                                    disabled
-                                    className="px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-neutral-lightGray/10 text-sm font-medium opacity-60 cursor-not-allowed"
-                                >
-                                    MoMo (sắp ra mắt)
-                                </button>
-                                <button
-                                    type="button"
-                                    disabled
-                                    className="px-4 py-3 rounded-lg ring-1 ring-neutral-lightGray/60 bg-neutral-lightGray/10 text-sm font-medium opacity-60 cursor-not-allowed"
-                                >
-                                    Thẻ quốc tế (Stripe) – sắp ra mắt
+                                    {submitting ? 'Đang xử lý...' : 'Thanh toán'}
                                 </button>
                             </div>
-                        </div>
-
-                        {/* Payment actions are above; no separate CTA needed */}
+                        </aside>
                     </motion.div>
                 )}
             </div>
