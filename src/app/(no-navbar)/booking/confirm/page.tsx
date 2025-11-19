@@ -137,13 +137,6 @@ const ConfirmBookingContent = () => {
     return (
         <div className="py-8 px-4 lg:px-8 min-h-screen">
             <div className="mx-auto">
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-neutral-darkGray">Xác nhận đặt vé</h1>
-                    {booking?.code && (
-                        <p className="text-sm text-neutral-darkGray/70 mt-1">Mã giữ chỗ: {booking.code}</p>
-                    )}
-                </div>
-
                 {loading && (
                     <div className="rounded-xl p-4 bg-white/70">Đang tải...</div>
                 )}
@@ -207,14 +200,14 @@ const ConfirmBookingContent = () => {
                         animate={{ opacity: 1, y: 0 }}
                     >
                         <div className="rounded-2xl bg-white shadow-xl ring-1 ring-neutral-lightGray/30 overflow-hidden">
-                            <div className="px-6 py-5 border-b border-neutral-lightGray/30 bg-gradient-to-r from-primary-pink to-pink-400 text-white">
+                            <div className="px-6 py-5 border-b border-neutral-lightGray/30 bg-primary-pink text-white">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-semibold uppercase tracking-wide">Thông tin vé</p>
-                                        {booking.code && <p className="text-xs text-white/80 mt-0.5">Mã giữ chỗ: {booking.code}</p>}
+                                        {booking.code && <p className="text-xs text-white/90 mt-0.5">Mã giữ chỗ: {booking.code}</p>}
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs text-white/70">Thời gian còn lại</p>
+                                        <p className="text-xs text-white/90">Thời gian còn lại</p>
                                         <p className="text-2xl font-bold">{formattedHoldTime}</p>
                                     </div>
                                 </div>
@@ -284,11 +277,11 @@ const ConfirmBookingContent = () => {
                             </div>
                         </div>
 
-                        <aside className="rounded-2xl bg-white shadow-xl ring-1 ring-neutral-lightGray/30 overflow-hidden h-fit">
-                            <div className="p-6 space-y-4">
+                        <aside className="lg:sticky lg:top-22 rounded-2xl bg-white shadow-xl ring-1 ring-neutral-lightGray/30 overflow-hidden flex flex-col max-h-[calc(100vh-8rem)]">
+                            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
                                 <button
                                     type="button"
-                                    className="w-full rounded-xl bg-gradient-to-r from-primary-pink to-pink-400 text-white text-sm font-semibold py-3 shadow"
+                                    className="w-full rounded-xl bg-primary-pink text-white text-sm font-semibold py-3 transition-colors hover:bg-primary-pink/90"
                                 >
                                     Sử dụng Coupon hoặc Voucher
                                 </button>
@@ -347,7 +340,7 @@ const ConfirmBookingContent = () => {
                                     <p>Không hoàn tiền cho các đơn đã thanh toán thành công.</p>
                                 </div>
                             </div>
-                            <div className="p-6 border-t border-neutral-lightGray/40 bg-neutral-lightGray/5">
+                            <div className="flex-shrink-0 p-4 md:p-6 border-t border-neutral-lightGray/40 bg-white">
                                 <button
                                     type="button"
                                     disabled={submitting}

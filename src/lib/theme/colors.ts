@@ -1,7 +1,7 @@
 export const COLORS = {
   PRIMARY: {
     PINK: "#ec4899",
-    PURPLE: "#1f133a",
+    PURPLE: "#271659", // Thống nhất với tailwind.config.js và globals.css
     BLACK: "#0a0a0a",
   },
   ACCENT: {

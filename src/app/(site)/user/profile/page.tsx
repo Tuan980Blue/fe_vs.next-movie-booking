@@ -84,124 +84,152 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="min-h-screen py-16 px-4 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold text-neutral-700 mb-4">👤 Thông tin cá nhân</h1>
-                    <p className="text-neutral-700 opacity-75 text-lg">Quản lý thông tin tài khoản</p>
-                </div>
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-neutral-darkGray">Hồ sơ cá nhân</h1>
+                <p className="text-neutral-darkGray/70 mt-1">Quản lý thông tin tài khoản của bạn.</p>
+            </div>
 
-                <div className="rounded-2xl p-8">
-                    {isLoading ? (
-                        <div className="min-h-[120px] flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-pink"></div>
-                        </div>
-                    ) : !isAuthenticated || !user ? (
-                        <div className="text-center">
-                            <div className="text-6xl mb-4">🔒</div>
-                            <h2 className="text-2xl font-bold text-neutral-darkGray mb-2">Bạn chưa đăng nhập</h2>
-                            <p className="text-neutral-lightGray">Vui lòng đăng nhập để xem thông tin cá nhân.</p>
-                        </div>
-                    ) : (
-                        <div>
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 rounded-full bg-primary-purple text-neutral-white flex items-center justify-center text-3xl">
-                                        {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
+            {isLoading ? (
+                <div className="min-h-[120px] flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-pink"></div>
+                </div>
+            ) : !isAuthenticated || !user ? (
+                <div className="text-center rounded-xl border border-neutral-lightGray/40 bg-white p-12 shadow-sm">
+                    <div className="text-6xl mb-4">🔒</div>
+                    <h2 className="text-2xl font-bold text-neutral-darkGray mb-2">Bạn chưa đăng nhập</h2>
+                    <p className="text-neutral-darkGray/70">Vui lòng đăng nhập để xem thông tin cá nhân.</p>
+                </div>
+            ) : (
+                        <div className="space-y-6">
+                            <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-6 shadow-sm">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-16 h-16 rounded-full bg-primary-pink text-neutral-white flex items-center justify-center text-3xl font-bold">
+                                            {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
+                                        </div>
+                                        <div>
+                                            <h2 className="text-xl font-bold text-neutral-darkGray">{user.fullName || '-'}</h2>
+                                            <p className="text-neutral-darkGray/70 text-sm">{user.email || '-'}</p>
+                                        </div>
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl font-bold text-neutral-darkGray">{user.fullName || '-'}</h2>
-                                        <p className="text-neutral-lightGray">{user.email || '-'}</p>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${isAdmin ? 'bg-primary-pink/10 text-primary-pink' : 'bg-neutral-lightGray/10 text-neutral-darkGray'}`}>
+                                            {isAdmin ? 'Admin' : 'User'}
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="mt-4 sm:mt-0">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${isAdmin ? 'bg-green-100 text-green-700' : 'bg-neutral-lightGray text-neutral-darkGray'}`}>
-                    {isAdmin ? 'Admin' : 'User'}
-                  </span>
-                                </div>
-                            </div>
 
-                            <div className="flex items-center gap-3 mb-6">
-                                <button onClick={startEdit} className="px-4 py-2 rounded-lg bg-primary-purple text-neutral-white hover:opacity-90">Cập nhật hồ sơ</button>
-                                <button onClick={startChangePwd} className="px-4 py-2 rounded-lg bg-accent-orange text-neutral-white hover:opacity-90">Đổi mật khẩu</button>
+                                <div className="flex items-center gap-3 mt-6 pt-6 border-t border-neutral-lightGray/30">
+                                    <button onClick={startEdit} className="px-4 py-2 rounded-lg bg-primary-pink text-white hover:bg-primary-pink/90 transition-colors text-sm font-medium">Cập nhật hồ sơ</button>
+                                    <button onClick={startChangePwd} className="px-4 py-2 rounded-lg bg-white border border-neutral-lightGray/40 text-neutral-darkGray hover:bg-neutral-lightGray/10 transition-colors text-sm font-medium">Đổi mật khẩu</button>
+                                </div>
                             </div>
 
                             {/* Edit Profile */}
                             {isEditing && (
-                                <form onSubmit={handleSaveProfile} className="border rounded-xl p-5 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <form onSubmit={handleSaveProfile} className="rounded-xl border border-neutral-lightGray/40 bg-white p-6 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <div className="text-neutral-lightGray text-sm mb-1">Họ và tên</div>
-                                        <input name="fullName" value={editForm.fullName} onChange={onEditChange} className="w-full px-3 py-2 border rounded-lg" />
+                                        <label className="text-neutral-darkGray/70 text-sm font-medium mb-2 block">Họ và tên</label>
+                                        <input 
+                                            name="fullName" 
+                                            value={editForm.fullName} 
+                                            onChange={onEditChange} 
+                                            className="w-full px-4 py-2 border border-neutral-lightGray/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-pink/50 focus:border-primary-pink text-neutral-darkGray" 
+                                        />
                                     </div>
                                     <div>
-                                        <div className="text-neutral-lightGray text-sm mb-1">Điện thoại</div>
-                                        <input name="phone" value={editForm.phone} onChange={onEditChange} className="w-full px-3 py-2 border rounded-lg" />
+                                        <label className="text-neutral-darkGray/70 text-sm font-medium mb-2 block">Điện thoại</label>
+                                        <input 
+                                            name="phone" 
+                                            value={editForm.phone} 
+                                            onChange={onEditChange} 
+                                            className="w-full px-4 py-2 border border-neutral-lightGray/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-pink/50 focus:border-primary-pink text-neutral-darkGray" 
+                                        />
                                     </div>
                                     <div className="sm:col-span-2 flex gap-3">
-                                        <button type="submit" className="px-4 py-2 rounded-lg bg-primary-purple text-neutral-white hover:opacity-90">Lưu</button>
-                                        <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-neutral-lightGray text-neutral-darkGray hover:opacity-90">Huỷ</button>
+                                        <button type="submit" className="px-4 py-2 rounded-lg bg-primary-pink text-white hover:bg-primary-pink/90 transition-colors text-sm font-medium">Lưu</button>
+                                        <button type="button" onClick={cancelEdit} className="px-4 py-2 rounded-lg bg-white border border-neutral-lightGray/40 text-neutral-darkGray hover:bg-neutral-lightGray/10 transition-colors text-sm font-medium">Huỷ</button>
                                     </div>
                                 </form>
                             )}
 
                             {/* Change Password */}
                             {isChangingPassword && (
-                                <form onSubmit={handleChangePassword} className="border rounded-xl p-5 mb-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <form onSubmit={handleChangePassword} className="rounded-xl border border-neutral-lightGray/40 bg-white p-6 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-6">
                                     <div>
-                                        <div className="text-neutral-lightGray text-sm mb-1">Mật khẩu hiện tại</div>
-                                        <input type="password" name="currentPassword" value={pwdForm.currentPassword} onChange={onPwdChange} className="w-full px-3 py-2 border rounded-lg" />
+                                        <label className="text-neutral-darkGray/70 text-sm font-medium mb-2 block">Mật khẩu hiện tại</label>
+                                        <input 
+                                            type="password" 
+                                            name="currentPassword" 
+                                            value={pwdForm.currentPassword} 
+                                            onChange={onPwdChange} 
+                                            className="w-full px-4 py-2 border border-neutral-lightGray/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-pink/50 focus:border-primary-pink text-neutral-darkGray" 
+                                        />
                                     </div>
                                     <div>
-                                        <div className="text-neutral-lightGray text-sm mb-1">Mật khẩu mới</div>
-                                        <input type="password" name="newPassword" value={pwdForm.newPassword} onChange={onPwdChange} className="w-full px-3 py-2 border rounded-lg" />
+                                        <label className="text-neutral-darkGray/70 text-sm font-medium mb-2 block">Mật khẩu mới</label>
+                                        <input 
+                                            type="password" 
+                                            name="newPassword" 
+                                            value={pwdForm.newPassword} 
+                                            onChange={onPwdChange} 
+                                            className="w-full px-4 py-2 border border-neutral-lightGray/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-pink/50 focus:border-primary-pink text-neutral-darkGray" 
+                                        />
                                     </div>
                                     <div>
-                                        <div className="text-neutral-lightGray text-sm mb-1">Xác nhận mật khẩu</div>
-                                        <input type="password" name="confirmPassword" value={pwdForm.confirmPassword} onChange={onPwdChange} className="w-full px-3 py-2 border rounded-lg" />
+                                        <label className="text-neutral-darkGray/70 text-sm font-medium mb-2 block">Xác nhận mật khẩu</label>
+                                        <input 
+                                            type="password" 
+                                            name="confirmPassword" 
+                                            value={pwdForm.confirmPassword} 
+                                            onChange={onPwdChange} 
+                                            className="w-full px-4 py-2 border border-neutral-lightGray/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-pink/50 focus:border-primary-pink text-neutral-darkGray" 
+                                        />
                                     </div>
                                     <div className="sm:col-span-3 flex gap-3">
-                                        <button type="submit" className="px-4 py-2 rounded-lg bg-accent-orange text-neutral-white hover:opacity-90">Đổi mật khẩu</button>
-                                        <button type="button" onClick={cancelChangePwd} className="px-4 py-2 rounded-lg bg-neutral-lightGray text-neutral-darkGray hover:opacity-90">Huỷ</button>
+                                        <button type="submit" className="px-4 py-2 rounded-lg bg-primary-pink text-white hover:bg-primary-pink/90 transition-colors text-sm font-medium">Đổi mật khẩu</button>
+                                        <button type="button" onClick={cancelChangePwd} className="px-4 py-2 rounded-lg bg-white border border-neutral-lightGray/40 text-neutral-darkGray hover:bg-neutral-lightGray/10 transition-colors text-sm font-medium">Huỷ</button>
                                     </div>
                                 </form>
                             )}
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">ID</div>
-                                    <div className="font-semibold text-neutral-darkGray break-all">{user.id || '-'}</div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">ID</div>
+                                    <div className="font-semibold text-neutral-darkGray break-all text-sm">{user.id || '-'}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Email</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Email</div>
                                     <div className="font-semibold text-neutral-darkGray">{user.email || '-'}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Họ và tên</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Họ và tên</div>
                                     <div className="font-semibold text-neutral-darkGray">{user.fullName || '-'}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Điện thoại</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Điện thoại</div>
                                     <div className="font-semibold text-neutral-darkGray">{user.phone || '-'}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Trạng thái</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Trạng thái</div>
                                     <div className="font-semibold text-neutral-darkGray">{user.status === 1 ? 'Hoạt động' : user.status === 2 ? 'Không hoạt động' : user.status === 3 ? 'Bị cấm' : '-'}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Vai trò</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Vai trò</div>
                                     <div className="font-semibold text-neutral-darkGray capitalize">{user.roles?.[0] || '-'}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Tạo lúc</div>
-                                    <div className="font-semibold text-neutral-darkGray">{formatDate(user.createdAt)}</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Tạo lúc</div>
+                                    <div className="font-semibold text-neutral-darkGray text-sm">{formatDate(user.createdAt)}</div>
                                 </div>
-                                <div className="border rounded-xl p-5">
-                                    <div className="text-neutral-lightGray text-sm mb-1">Cập nhật lúc</div>
-                                    <div className="font-semibold text-neutral-darkGray">{formatDate(user.updatedAt)}</div>
+                                <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm">
+                                    <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Cập nhật lúc</div>
+                                    <div className="font-semibold text-neutral-darkGray text-sm">{formatDate(user.updatedAt)}</div>
                                 </div>
                                 {Array.isArray(user.roles) && (
-                                    <div className="border rounded-xl p-5 sm:col-span-2">
-                                        <div className="text-neutral-lightGray text-sm mb-1">Danh sách vai trò</div>
+                                    <div className="rounded-xl border border-neutral-lightGray/40 bg-white p-5 shadow-sm sm:col-span-2">
+                                        <div className="text-neutral-darkGray/70 text-sm font-medium mb-2">Danh sách vai trò</div>
                                         <div className="font-semibold text-neutral-darkGray">
                                             {user.roles.length ? user.roles.join(', ') : '-'}
                                         </div>
@@ -210,8 +238,6 @@ const ProfilePage = () => {
                             </div>
                         </div>
                     )}
-                </div>
-            </div>
         </div>
     );
 };
