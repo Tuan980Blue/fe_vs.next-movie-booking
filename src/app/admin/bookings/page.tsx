@@ -86,7 +86,7 @@ export default function ManageBookings() {
       />
 
       {/* Pagination */}
-      {bookings && bookings.totalPages > 0 && (
+      {bookings && bookings.totalItems > 0 && (
         <BookingPagination
           currentPage={bookings.page}
           totalPages={Math.ceil(bookings.totalItems / bookings.pageSize)}
