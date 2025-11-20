@@ -16,6 +16,7 @@ export default function TicketScanner({ onScan, loading, scannedCode }: TicketSc
   const [isScanning, setIsScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isScanningRef = useRef(false);
   const qrCodeRegionId = 'qr-reader';
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -40,14 +41,17 @@ export default function TicketScanner({ onScan, loading, scannedCode }: TicketSc
   }, []);
 
   const stopScanning = async () => {
-    if (scannerRef.current && isScanning) {
+    if (scannerRef.current && isScanningRef.current) {
       try {
         await scannerRef.current.stop();
         await scannerRef.current.clear();
-        setIsScanning(false);
-        setCameraError(null);
       } catch (err) {
         console.error('Error stopping scanner:', err);
+      } finally {
+        isScanningRef.current = false;
+        setIsScanning(false);
+        setCameraError(null);
+        scannerRef.current = null;
       }
     }
   };
@@ -56,6 +60,7 @@ export default function TicketScanner({ onScan, loading, scannedCode }: TicketSc
     try {
       setCameraError(null);
       setIsScanning(true);
+      isScanningRef.current = true;
 
       const scanner = new Html5Qrcode(qrCodeRegionId);
       scannerRef.current = scanner;
@@ -81,6 +86,8 @@ export default function TicketScanner({ onScan, loading, scannedCode }: TicketSc
       console.error('Error starting scanner:', err);
       setCameraError(err.message || 'Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập camera.');
       setIsScanning(false);
+      isScanningRef.current = false;
+      scannerRef.current = null;
     }
   };
 

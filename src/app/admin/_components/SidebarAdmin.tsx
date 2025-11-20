@@ -230,7 +230,7 @@ export default function SidebarAdmin({ isOpen, onClose }: SidebarAdminProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 start-0 bottom-0 z-50 w-64 bg-white border-e border-gray-200 shadow-lg transform transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 start-0 bottom-0 z-50 w-64 bg-white border-e border-gray-300 shadow-lg transform transition-all duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 lg:static lg:z-auto lg:shadow-none lg:h-full`}
         role="dialog"
