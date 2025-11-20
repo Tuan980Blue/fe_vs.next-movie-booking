@@ -162,7 +162,7 @@ const Navbar = () => {
                                             Profile
                                         </motion.button>
                                     </Link>
-                                    <Link href="/booking/my-booking">
+                                    <Link href="/user/bookings">
                                         <motion.button
                                             className="px-3 py-2 bg-neutral-lightGray cursor-pointer bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
                                             whileTap={{scale: 0.95}}
