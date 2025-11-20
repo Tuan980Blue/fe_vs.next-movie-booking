@@ -67,7 +67,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }: RegisterFormProps) => {
         {/* Ticket Card Container */}
         <div className="rounded-2xl shadow-2xl overflow-hidden relative border-2 border-neutral-lightGray border-dashed"
              style={{
-               background: `rgba(255, 255, 255, 0.1)`,
+                 background: `${COLORS.CINEMA.NAVY}`,
                backdropFilter: 'blur(5px)',
                WebkitBackdropFilter: 'blur(5px)'
              }}>
@@ -90,9 +90,6 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }: RegisterFormProps) => {
             <h1 className="text-white text-2xl font-bold drop-shadow-lg">
               🎬 Đăng ký tài khoản
             </h1>
-            <p className="text-white italic opacity-95 text-sm mt-2 drop-shadow-md">
-              Tham gia Cinema Booking System
-            </p>
             <div className="mt-1 text-white opacity-85 text-xs drop-shadow-md">
               <div>🎫 TICKET REGISTRATION</div>
             </div>
@@ -162,7 +159,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }: RegisterFormProps) => {
                         value={formData.password}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 pr-12 border-2 border-white/40 rounded-xl focus:border-primary-pink focus:outline-none transition-colors bg-white/30 backdrop-blur-sm text-white font-medium placeholder-white/60"
+                        className="w-full px-4 py-3 pr-12 border-2 border-white/40 rounded-xl focus:border-primary-pink focus:outline-none transition-colors bg-white/80 backdrop-blur-sm text-gray-800 font-medium placeholder-zinc-600"
                         placeholder="Nhập mật khẩu"
                       />
                       <button
@@ -187,7 +184,7 @@ const RegisterForm = ({ onRegister, onSwitchToLogin }: RegisterFormProps) => {
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-3 pr-12 border-2 border-white/40 rounded-xl focus:border-primary-pink focus:outline-none transition-colors bg-white/30 backdrop-blur-sm text-white font-medium placeholder-white/60"
+                        className="w-full px-4 py-3 pr-12 border-2 border-white/40 rounded-xl focus:border-primary-pink focus:outline-none transition-colors bg-white/80 backdrop-blur-sm text-gray-800 font-medium placeholder-zinc-600"
                         placeholder="Nhập lại mật khẩu"
                       />
                       <button
