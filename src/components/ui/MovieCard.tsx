@@ -13,7 +13,7 @@ const MovieCard = ({movie}: MovieCardProps) => {
         <div
             className="group rounded-2xl overflow-hidden bg-white/5 backdrop-blur-md border border-neutral-lightGray/70 shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
         >
-            <div className="relative aspect-[2/3] bg-neutral-lightGray/30 overflow-hidden">
+            <div className="relative aspect-[4/5] bg-neutral-lightGray/30 overflow-hidden">
                 {m.posterUrl ? (
                     <img
                         src={m.posterUrl}
@@ -37,10 +37,10 @@ const MovieCard = ({movie}: MovieCardProps) => {
                         <div className="w-full max-w-[210px] space-y-3">
                             <div className="w-full max-w-[200px] space-y-2.5">
                                 <Link href={`/movies/${m.id}`}
-                                      className="block w-full text-center text-sm font-extrabold tracking-wide bg-white text-pink-600 hover:bg-neutral-lightGray rounded-md py-2 transition-colors">CHI
+                                      className="block w-full text-center text-sm font-extrabold tracking-wide bg-white text-pink-600 hover:bg-gray-300 rounded-md py-2 transition-colors">CHI
                                     TIẾT</Link>
                                 <Link href={`/movies/${m.id}`}
-                                      className="block w-full text-center text-sm font-extrabold tracking-wide bg-pink-500 text-white hover:bg-cinema-neonPink rounded-md py-2 transition-colors shadow-[0_0_20px_rgba(245,61,122,0.35)]">MUA
+                                      className="block w-full text-center text-sm font-extrabold tracking-wide bg-pink-500 text-white hover:bg-pink-600 rounded-md py-2 transition-colors shadow-[0_0_20px_rgba(245,61,122,0.35)]">MUA
                                     VÉ</Link>
                             </div>
                             <div className="mt-3 text-left space-y-1 text-[13px] md:text-sm">

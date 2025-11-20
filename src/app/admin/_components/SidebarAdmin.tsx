@@ -13,7 +13,9 @@ import {
   XMarkIcon,
   Bars3Icon,
   Cog6ToothIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  TicketIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
 
 interface SidebarAdminProps {
@@ -42,6 +44,12 @@ export default function SidebarAdmin({ isOpen, onClose }: SidebarAdminProps) {
     }
     if (pathname.startsWith('/admin/users')) {
       currentExpanded.push('Quản lý người dùng');
+    }
+    if (pathname.startsWith('/admin/bookings')) {
+      currentExpanded.push('Quản lý đặt vé');
+    }
+    if (pathname.startsWith('/admin/tickets')) {
+      currentExpanded.push('Quản lý vé');
     }
     if (pathname.startsWith('/admin/settings')) {
       currentExpanded.push('Cài đặt');
@@ -73,6 +81,23 @@ export default function SidebarAdmin({ isOpen, onClose }: SidebarAdminProps) {
       children: [
         { href: "/admin/users", label: "Danh sách người dùng", icon: <UsersIcon className="size-4" /> },
         { href: "/admin/users/roles", label: "Phân quyền", icon: <UsersIcon className="size-4" /> }
+      ]
+    },
+    {
+      href: "/admin/bookings",
+      label: "Quản lý đặt vé",
+      icon: <ClipboardDocumentListIcon className="size-4" />,
+      children: [
+        { href: "/admin/bookings", label: "Danh sách đơn đặt vé", icon: <ClipboardDocumentListIcon className="size-4" /> }
+      ]
+    },
+    {
+      href: "/admin/tickets",
+      label: "Quản lý vé",
+      icon: <TicketIcon className="size-4" />,
+      children: [
+        { href: "/admin/tickets", label: "Trang chủ", icon: <TicketIcon className="size-4" /> },
+        { href: "/admin/tickets/check-ticket", label: "Check-in vé", icon: <TicketIcon className="size-4" /> }
       ]
     },
     {

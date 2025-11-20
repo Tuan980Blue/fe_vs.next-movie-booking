@@ -65,7 +65,7 @@ const LoginForm = ({ onLogin, onSwitchToRegister }: LoginFormProps) => {
           <div
             className="p-4 text-center relative"
             style={{
-              background: `linear-gradient(135deg, rgba(45, 27, 105, 0.9) 0%, rgba(45, 27, 105, 0.4)`,
+              background: `${COLORS.CINEMA.NAVY}`,
               borderBottom: `2px solid ${COLORS.CINEMA.NEON_PINK}`,
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)'

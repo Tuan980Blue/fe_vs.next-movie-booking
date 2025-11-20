@@ -39,8 +39,8 @@ export default function SeatButton({
         <motion.button
             type="button"
             onClick={onClick}
-            className={`h-8 rounded border flex items-center justify-center text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary-pink/40 transition-all duration-200 ${
-                isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:scale-105"
+            className={`h-8 rounded border flex items-center justify-center text-xs font-bold focus:outline-none transition-all duration-200 ${
+                isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
             }`}
             title={`${seat.rowLabel}${seat.seatNumber} • ${seat.seatType}`}
             aria-label={`${seat.rowLabel}${String(seat.seatNumber).padStart(2, "0")} ${seat.seatType}`}

@@ -71,10 +71,9 @@ const Navbar = () => {
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     {/* Left Side - Logo */}
                     <div className="flex items-center space-x-4">
-                        <Link href="/public">
+                        <Link href="/">
                             <motion.div
                                 className="flex items-center space-x-3"
-                                whileHover={{scale: 1.05}}
                             >
                                 <div className="w-12 h-12 rounded-full overflow-hidden shadow-lg">
                                     <img
@@ -91,16 +90,17 @@ const Navbar = () => {
                         </Link>
 
                         {/* Book Tickets Banner */}
-                        <motion.div
-                            className="hidden lg:flex items-center bg-accent-yellow px-4 py-2 rounded-lg border-2 border-accent-orange shadow-lg"
-                            whileHover={{scale: 1.02}}
-                        >
-                            <div className="flex items-center space-x-2">
-                                <span className="text-2xl">🎥</span>
-                                <span className="text-neutral-darkGray font-bold text-sm">ĐẶT VÉ NGAY</span>
-                                <span className="text-xl">🍿</span>
-                            </div>
-                        </motion.div>
+                        <Link href={"/movies"}>
+                            <motion.div
+                                className="hidden lg:flex items-center bg-accent-yellow px-4 py-2 rounded-lg border-2 border-accent-orange shadow-lg"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-2xl">🎥</span>
+                                    <span className="text-neutral-darkGray font-bold text-sm">ĐẶT VÉ NGAY</span>
+                                    <span className="text-xl">🍿</span>
+                                </div>
+                            </motion.div>
+                        </Link>
                     </div>
 
                     {/* Middle - Search and Language */}
@@ -124,7 +124,6 @@ const Navbar = () => {
                         {/* Language Selector */}
                         <motion.button
                             className="w-8 h-8 rounded-full bg-accent-red flex items-center justify-center shadow-lg"
-                            whileHover={{scale: 1.1}}
                             whileTap={{scale: 0.95}}
                         >
                             <span className="text-neutral-white text-xs font-bold">VN</span>
@@ -141,7 +140,7 @@ const Navbar = () => {
                                     <AdminOnly>
                                         <Link href="/admin">
                                             <motion.button
-                                                className="px-3 py-2 bg-neutral-800 border rounded-2xl text-white transition-all text-sm font-semibold"
+                                                className="px-3 py-2 bg-neutral-800 cursor-pointer border rounded-2xl text-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm font-semibold"
                                                 whileTap={{scale: 0.95}}
                                             >
                                                 🎭 Admin
@@ -157,8 +156,7 @@ const Navbar = () => {
                                 <div className="hidden sm:flex items-center space-x-2">
                                     <Link href="/user/profile">
                                         <motion.button
-                                            className="px-3 py-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
-                                            whileHover={{scale: 1.05}}
+                                            className="px-3 py-2 bg-neutral-lightGray cursor-pointer bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
                                             whileTap={{scale: 0.95}}
                                         >
                                             Profile
@@ -166,8 +164,7 @@ const Navbar = () => {
                                     </Link>
                                     <Link href="/booking/my-booking">
                                         <motion.button
-                                            className="px-3 py-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
-                                            whileHover={{scale: 1.05}}
+                                            className="px-3 py-2 bg-neutral-lightGray cursor-pointer bg-opacity-20 border border-neutral-white rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all text-sm"
                                             whileTap={{scale: 0.95}}
                                         >
                                             Vé của tôi
@@ -178,8 +175,7 @@ const Navbar = () => {
                                 {/* Logout Button */}
                                 <motion.button
                                     onClick={handleLogout}
-                                    className="flex items-center space-x-2 bg-accent-red px-4 py-2 rounded-full text-neutral-white hover:bg-red-600 transition-all shadow-lg"
-                                    whileHover={{scale: 1.05}}
+                                    className="flex items-center cursor-pointer space-x-2 bg-accent-red px-4 py-2 rounded-full text-neutral-white hover:bg-red-600 transition-all shadow-lg"
                                     whileTap={{scale: 0.95}}
                                 >
                                     <span className="text-lg">🚪</span>
@@ -191,8 +187,7 @@ const Navbar = () => {
                                 {/* Register Button */}
                                 <Link href="/auth">
                                     <motion.button
-                                        className="hidden sm:flex items-center space-x-2 bg-neutral-lightGray bg-opacity-20 border border-neutral-white px-4 py-2 rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all cursor-pointer"
-                                        whileHover={{scale: 1.05}}
+                                        className="hidden sm:flex items-center space-x-2 bg-gray-800 bg-opacity-20 border border-neutral-white px-4 py-2 rounded-full text-neutral-white hover:bg-neutral-white hover:text-primary-purple transition-all cursor-pointer"
                                         whileTap={{scale: 0.95}}
                                     >
                                         <span className="text-lg">🍿</span>
@@ -203,8 +198,7 @@ const Navbar = () => {
                                 {/* Login Button */}
                                 <Link href="/auth">
                                     <motion.button
-                                        className="flex items-center space-x-2 bg-primary-pink px-4 py-2 rounded-full text-neutral-white hover:bg-cinema-neonPink transition-all shadow-lg"
-                                        whileHover={{scale: 1.05}}
+                                        className="flex items-center space-x-2 bg-primary-pink px-4 py-2 rounded-full text-neutral-white hover:bg-pink-600 transition-all shadow-lg"
                                         whileTap={{scale: 0.95}}
                                     >
                                         <span className="text-lg">🥤</span>
@@ -217,7 +211,6 @@ const Navbar = () => {
                         {/* Notifications */}
                         <motion.button
                             className="w-10 h-10 bg-primary-pink rounded-full flex items-center justify-center text-neutral-white hover:bg-cinema-neonPink transition-all shadow-lg"
-                            whileHover={{scale: 1.1}}
                             whileTap={{scale: 0.9}}
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +254,6 @@ const Navbar = () => {
                                             ? 'bg-primary-pink text-neutral-white'
                                             : 'text-neutral-white hover:text-accent-yellow hover:bg-neutral-white hover:bg-opacity-10'
                                     }`}
-                                    whileHover={{y: -2}}
                                     whileTap={{scale: 0.98}}
                                 >
                                     <span className="mr-2">{item.icon}</span>
