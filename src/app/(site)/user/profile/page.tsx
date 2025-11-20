@@ -84,7 +84,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-4 lg:p-8 min-h-screen bg-white rounded-3xl">
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-neutral-darkGray">Hồ sơ cá nhân</h1>
                 <p className="text-neutral-darkGray/70 mt-1">Quản lý thông tin tài khoản của bạn.</p>

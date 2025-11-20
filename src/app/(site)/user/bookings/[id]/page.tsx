@@ -19,7 +19,7 @@ export default async function BookingDetailPage({ params }: PageProps) {
     const bookingId = resolvedParams.id;
 
     return (
-        <div className="py-8 px-4 lg:px-8 min-h-screen bg-white">
+        <div className="py-8 px-4 lg:px-8 min-h-screen bg-white rounded-3xl">
             <div className="mx-auto max-w-6xl">
                 <Suspense fallback={<SuspenseFallback />}>
                     <BookingDetail bookingId={bookingId} />

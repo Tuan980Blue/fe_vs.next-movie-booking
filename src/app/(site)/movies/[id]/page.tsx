@@ -91,7 +91,7 @@ const MovieDetailPage = () => {
     return (
         <div className="min-h-screen mb-8 lg:mb-16">
             {/* Hero Section - Cinema Style */}
-            <div className="relative h-[85vh] lg:h-[90vh] overflow-hidden">
+            <div className="relative h-[80vh] lg:h-[85vh] overflow-hidden">
                 {/* Dynamic Backdrop với Parallax Effect */}
                 <motion.div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"

@@ -36,7 +36,7 @@ export default function UserDashboardPage() {
     }, []);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-4 lg:p-8 bg-white rounded-3xl">
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-neutral-darkGray">Tổng quan tài khoản</h1>
                 <p className="text-neutral-darkGray/70 mt-1">Tổng hợp nhanh thông tin và hoạt động gần đây.</p>
