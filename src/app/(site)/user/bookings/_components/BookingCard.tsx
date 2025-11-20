@@ -79,7 +79,7 @@ export default function BookingCard({ booking }: BookingCardProps) {
     return (
         <Link href={`/user/bookings/${booking.id}`}>
             <motion.div
-                className="rounded-xl border border-neutral-lightGray/40 bg-white shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
+                className="rounded-xl border-b-4 border-pink-400 bg-white shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
                 whileHover={{ y: -2 }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

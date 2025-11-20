@@ -4,7 +4,7 @@ import BookingList from "./_components/BookingList";
 
 export default function UserBookingsPage() {
     return (
-        <div className="px-4 lg:px-8 min-h-screen bg-white">
+        <div className="p-4 lg:p-8 min-h-screen bg-white rounded-3xl">
             <div className="mx-auto max-w-6xl">
                 <div className="mb-6">
                     <h1 className="text-2xl md:text-3xl font-bold text-neutral-darkGray">Đơn đặt vé</h1>

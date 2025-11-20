@@ -2,7 +2,7 @@
 
 export default function UserSettingsPage() {
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 p-4 lg:p-8 min-h-screen bg-white rounded-3xl">
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-neutral-darkGray">Cài đặt</h1>
                 <p className="text-neutral-darkGray/70 mt-1">Tùy chỉnh tài khoản và bảo mật.</p>
