@@ -62,12 +62,12 @@ export default function SeatSelectionErrorCard({
                     actions: [
                         {
                             label: 'Đăng nhập ngay',
-                            href: '/auth/login?redirect=' + encodeURIComponent(`/booking/seat-selection?id=${showtimeId || ''}`),
+                            href: '/auth',
                             primary: true
                         },
                         {
                             label: 'Đăng ký tài khoản mới',
-                            href: '/auth/register',
+                            href: '/auth',
                             primary: false
                         }
                     ],
