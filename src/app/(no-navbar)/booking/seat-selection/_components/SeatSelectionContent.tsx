@@ -18,6 +18,8 @@ import { type RootState } from "@/store/store";
 import { toggleSeatId, clearSelectedSeatIds } from "@/store/slices/seatSelection/seatSelectionSlice";
 import { getLockedSeatsApi } from "@/service";
 import { createBookingApi } from "@/service";
+import SeatSelectionErrorCard from "./SeatSelectionErrorCard";
+import axios from "axios";
 
 const SeatSelectionContent = () => {
     const router = useRouter();
@@ -35,6 +37,7 @@ const SeatSelectionContent = () => {
     const [layout, setLayout] = useState<SeatLayoutUi | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
+    const [errorStatusCode, setErrorStatusCode] = useState<number | undefined>(undefined);
     const [actionLoading, setActionLoading] = useState<boolean>(false);
 
     // Realtime lock/booked state
@@ -274,6 +277,7 @@ const SeatSelectionContent = () => {
         if (!showtimeId || selectedSeatIds.length === 0 || actionLoading) return;
         setActionLoading(true);
         setError('');
+        setErrorStatusCode(undefined);
         try {
             const draft = await createBookingApi({
                 showtimeId,
@@ -287,7 +291,18 @@ const SeatSelectionContent = () => {
                 router.push(`/booking/confirm?id=${encodeURIComponent(showtimeId)}`);
             }
         } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : 'Không thể tạo đơn giữ chỗ. Vui lòng thử lại.');
+            let errorMessage = 'Không thể tạo đơn giữ chỗ. Vui lòng thử lại.';
+            let statusCode: number | undefined = undefined;
+
+            if (axios.isAxiosError(e)) {
+                statusCode = e.response?.status;
+                errorMessage = e.response?.data?.message || e.message || errorMessage;
+            } else if (e instanceof Error) {
+                errorMessage = e.message;
+            }
+
+            setError(errorMessage);
+            setErrorStatusCode(statusCode);
         } finally {
             setActionLoading(false);
         }
@@ -314,19 +329,12 @@ const SeatSelectionContent = () => {
                     )}
 
                     {!loading && error && (
-                        <motion.div
-                            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-800"
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                        >
-                            <div className="flex items-start gap-2">
-                                <span className="text-lg">⚠️</span>
-                                <div className="flex-1">
-                                    <p className="font-medium">{error}</p>
-                                    <p className="text-sm text-red-600 mt-1">Vui lòng thử lại hoặc chọn ghế khác.</p>
-                                </div>
-                            </div>
-                        </motion.div>
+                        <SeatSelectionErrorCard
+                            error={error}
+                            showtimeId={showtimeId}
+                            statusCode={errorStatusCode}
+                            onRetry={goToConfirm}
+                        />
                     )}
 
                     {!loading && !error && layout && (

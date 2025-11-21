@@ -242,7 +242,7 @@ const PaymentStatusContent = ({status}: Props) => {
             return [
                 {
                     label: "Xem vé của tôi",
-                    href: "/user/bookings/{id}",
+                    href: `/user/bookings/${booking?.id}`,
                     variant: "primary",
                     description: "Kiểm tra mã QR và lịch sử giao dịch"
                 },
