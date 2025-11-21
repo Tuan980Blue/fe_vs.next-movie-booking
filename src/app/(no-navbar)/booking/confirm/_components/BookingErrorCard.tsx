@@ -57,12 +57,12 @@ export default function BookingErrorCard({ error, bookingId, statusCode }: Booki
                     actions: [
                         {
                             label: 'Đăng nhập ngay',
-                            href: '/auth/login?redirect=' + encodeURIComponent(`/booking/confirm?bookingId=${bookingId || ''}`),
+                            href: '/auth',
                             primary: true
                         },
                         {
                             label: 'Đăng ký tài khoản mới',
-                            href: '/auth/register',
+                            href: '/auth',
                             primary: false
                         }
                     ]
