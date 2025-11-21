@@ -293,21 +293,12 @@ const SeatSelectionContent = () => {
         }
     };
 
-    if (!showtime && loading) {
+    if (loading) {
         return <SeatSelectionSkeleton />;
-    }
-
-    if (!showtime && !loading) {
-        return (
-            <div className="min-h-screen py-16 px-4 lg:px-8 flex items-center justify-center">
-                <div className="text-neutral-darkGray">Đang chuyển hướng...</div>
-            </div>
-        );
     }
 
     return (
         <div className="py-8 px-4 lg:px-8 min-h-screen bg-white">
-            {loading && <SeatSelectionSkeleton />}
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-4">
                     <Timer secondsLeft={secondsLeft} />
