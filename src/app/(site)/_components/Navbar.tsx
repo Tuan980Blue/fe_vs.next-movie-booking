@@ -284,6 +284,20 @@ const Navbar = () => {
                         exit={{opacity: 0, height: 0}}
                     >
                         <div className="py-4 space-y-2">
+                            {/* Admin menu for mobile */}
+                            <AdminOnly>
+                                <Link href="/admin">
+                                    <motion.button
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-semibold text-sm bg-white text-gray-800 transition-all"
+                                        whileTap={{scale: 0.97}}
+                                    >
+                                        <span className="text-lg">🎭</span>
+                                        <span>Admin Dashboard</span>
+                                    </motion.button>
+                                </Link>
+                            </AdminOnly>
+
                             {menuItems.map((item) => (
                                 <Link key={item.id} href={item.path}>
                                     <motion.button
